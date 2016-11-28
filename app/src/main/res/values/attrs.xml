@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AccountView">
+        <attr name="title" format="string"/>
+        <attr name="titlebackground" format="color"/>
+        <attr name="cost" format="float"/>
+        <attr name="costcolor" format="color"/>
+        <attr name="information" format="string"/>
+        <attr name="time" format="string"/>
+    </declare-styleable>
+
+    <declare-styleable name="AddAccountView">
+        <attr name="text" format="string"/>
+        <attr name="textbackground" format="color"/>
+        <attr name="detailtext" format="string"/>
+    </declare-styleable>
+
+    <declare-styleable name="StatisticsView">
+        <attr name="type" format="string"/>
+        <attr name="color" format="color"/>
+    </declare-styleable>
+</resources>
