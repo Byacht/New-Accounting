@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:statistics="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_statistics"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -19,31 +18,45 @@
         android:layout_height="wrap_content"
         android:text="2016年11月"
         android:textSize="20dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:background="#BDBDBD"/>
 
-    <com.example.dn.accounting.View.StatisticsView
-        android:id="@+id/cost_statistics"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_margin="5dp"
-        statistics:type="支出"
-        statistics:color="@color/costColor"/>
+        android:layout_height="match_parent"
+        android:id="@+id/activity_statistics">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <com.example.dn.accounting.View.StatisticsView
+                android:id="@+id/cost_statistics"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="5dp"
+                statistics:type="支出"
+                statistics:color="@color/costColor"/>
 
-    <com.example.dn.accounting.View.StatisticsView
-        android:id="@+id/income_statistics"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_margin="5dp"
-        statistics:type="收入"
-        statistics:color="@color/incomeColor"/>
+            <com.example.dn.accounting.View.StatisticsView
+                android:id="@+id/income_statistics"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="5dp"
+                statistics:type="收入"
+                statistics:color="@color/incomeColor"/>
 
-    <com.example.dn.accounting.View.StatisticsView
-        android:id="@+id/balance_statistics"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_margin="5dp"
-        statistics:type="结余"
-        statistics:color="@color/costColor"/>
+            <com.example.dn.accounting.View.StatisticsView
+                android:id="@+id/balance_statistics"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="5dp"
+                statistics:type="结余"
+                statistics:color="@color/costColor"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+
 
 
 </LinearLayout>

@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,7 +32,6 @@ public class StatisticsActivity extends AppCompatActivity {
     private StatisticsView all_income;
     private StatisticsView all_banlance;
     private SQLiteDatabase mDataBase;
-    private AccountDataBase mAccountDataBase;
     private List<Account> accounts;
     private float income = 0;
     private float cost = 0;
@@ -64,7 +64,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void showChooseTimeView(){
-        LinearLayout layout = (LinearLayout)findViewById(R.id.activity_statistics);
+        FrameLayout layout = (FrameLayout) findViewById(R.id.activity_statistics);
         View view = LayoutInflater.from(this).inflate(R.layout.view_choose_time,null,false);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,RelativeLayout.TRUE);
