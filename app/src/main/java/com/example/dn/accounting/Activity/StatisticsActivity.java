@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.dn.accounting.DataBase.AccountDataBase;
@@ -36,7 +37,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private float income = 0;
     private float cost = 0;
     private float balance;
-    private TextView textView;
+    private Spinner mSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +65,12 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void showChooseTimeView(){
-        FrameLayout layout = (FrameLayout) findViewById(R.id.activity_statistics);
-        View view = LayoutInflater.from(this).inflate(R.layout.view_choose_time,null,false);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,RelativeLayout.TRUE);
-        layout.addView(view,layoutParams);
+//        FrameLayout layout = (FrameLayout) findViewById(R.id.activity_statistics);
+//        View view = LayoutInflater.from(this).inflate(R.layout.view_choose_time,null,false);
+//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,RelativeLayout.TRUE);
+//        layout.addView(view,layoutParams);
+        mSpinner = (Spinner) findViewById(R.id.spinner);
 
     }
 
@@ -124,16 +126,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void setupChooseTimeView() {
-        textView = (TextView) findViewById(R.id.textview_statistics);
-        Drawable drawable = getResources().getDrawable(R.drawable.downarrows);
-        drawable.setBounds(-40, -0, 0, 40);
-        textView.setCompoundDrawables(null,null,drawable,null);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showChooseTimeView();
-            }
-        });
+
     }
 
     private void setupDataBase() {

@@ -17,7 +17,11 @@
         </activity>
         <activity android:name=".Activity.AddAccountActivity" />
         <activity android:name=".Activity.Main2Activity" />
-        <activity android:name=".Activity.StatisticsActivity"></activity>
+        <activity android:name=".Activity.StatisticsActivity" />
+        <activity android:name=".Activity.AlarmActivity" />
+        <activity android:name=".Activity.addAlarmInformation"></activity>
+        <service android:name=".Service.AlarmService"/>
+        <receiver android:name=".Receiver.AlarmReceiver"/>
     </application>
 
 </manifest>

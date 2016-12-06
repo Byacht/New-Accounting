@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:toggle="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_alarm"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.dn.accounting.Activity.AlarmActivity">
+
+    <LinearLayout
+        android:id="@+id/everyday_alarm_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/alarm"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="fitXY"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:textSize="20sp"
+            android:text="每日记账提醒"/>
+        <com.zcw.togglebutton.ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="40dp"
+            toggle:tbOnColor="#536DFE"
+            toggle:tbOffColor="#9E9E9E"
+            toggle:tbSpotColor="#F5F5F5"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="30dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/addAlarmLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/add_alarm"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="fitXY"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:textSize="20sp"
+            android:text="添加记账提醒"/>
+
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

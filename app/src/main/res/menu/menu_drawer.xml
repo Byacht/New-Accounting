@@ -7,6 +7,11 @@
             android:icon="@drawable/statistics"
             android:title="统计分析"/>
         <item
+            android:id="@+id/nav_alarm"
+            android:checkable="true"
+            android:icon="@drawable/alarm"
+            android:title="记账提醒"/>
+        <item
             android:id="@+id/nav_setting"
             android:checkable="true"
             android:icon="@drawable/setting"

@@ -12,14 +12,13 @@
         android:background="@color/colorPrimary">
     </android.support.v7.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/textview_statistics"
+    <Spinner
+        android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="2016年11月"
-        android:textSize="20dp"
         android:gravity="center"
-        android:background="#BDBDBD"/>
+        android:entries="@array/languages">
+    </Spinner>
 
     <FrameLayout
         android:layout_width="match_parent"

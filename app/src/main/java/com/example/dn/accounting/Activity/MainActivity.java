@@ -229,8 +229,12 @@ public class MainActivity extends AppCompatActivity {
                 item.setChecked(true);
                 switch (item.getItemId()){
                     case R.id.nav_statistics:
-                        Intent intent = new Intent(MainActivity.this,StatisticsActivity.class);
-                        startActivity(intent);
+                        Intent statisticsIntent = new Intent(MainActivity.this,StatisticsActivity.class);
+                        startActivity(statisticsIntent);
+                        break;
+                    case R.id.nav_alarm:
+                        Intent alarmIntent = new Intent(MainActivity.this,AlarmActivity.class);
+                        startActivity(alarmIntent);
                         break;
                     case R.id.nav_setting:
                         break;
