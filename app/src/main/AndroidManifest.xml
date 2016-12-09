@@ -21,7 +21,11 @@
         <activity android:name=".Activity.AlarmActivity" />
         <activity android:name=".Activity.addAlarmInformation"></activity>
         <service android:name=".Service.AlarmService"/>
-        <receiver android:name=".Receiver.AlarmReceiver"/>
+        <receiver android:name=".Receiver.AlarmReceiver">
+            <intent-filter>
+                <action android:name="com.example.dn.alarm"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

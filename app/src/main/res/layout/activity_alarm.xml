@@ -21,12 +21,20 @@
             android:layout_gravity="center_vertical"
             android:scaleType="fitXY"/>
         <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:layout_gravity="center_vertical"
+        android:textSize="20sp"
+        android:text="每日记账提醒"/>
+        <TextView
+            android:id="@+id/alarmTimeText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:layout_gravity="center_vertical"
-            android:textSize="20sp"
-            android:text="每日记账提醒"/>
+            android:textSize="18sp"
+            android:textColor="#9E9E9E"/>
         <com.zcw.togglebutton.ToggleButton
             android:id="@+id/toggleButton"
             android:layout_width="40dp"
