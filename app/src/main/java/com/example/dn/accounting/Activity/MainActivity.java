@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -23,8 +25,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.andreabaccega.widget.FormEditText;
 import com.example.dn.accounting.DataBase.DBManager;
@@ -34,19 +38,32 @@ import com.example.dn.accounting.DataBase.AccountDataBase;
 import com.example.dn.accounting.R;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.example.dn.accounting.R.id.income_textview;
 
 public class MainActivity extends AppCompatActivity {
 
     private ImageView add;
     private Toolbar toolbar;
     private List<Account> accounts;
+    private List<Account> selectedAccounts;
     private RecyclerView recyclerView;
     private AccountAdapter adapter;
     private SQLiteDatabase mDataBase;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private Button deleteBtn;
+    private Button selectAllBtn;
+    private boolean isShowCheckBox;
+    private boolean isSelectAll = true;
+    private TextView mIncomeTextView;
+    private TextView mCostTextView;
+    private float mIncome;
+    private float mCost;
+    private String mCurrentYearAndMonth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +71,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        mCurrentYearAndMonth = getCurrentTime().substring(0, 7);
         setupToolBar();
         setupWindowAnimations();
         setupDataBase();
         getDatasFromDataBase();
+        setIncomeAndCost();
         setupRecylerView();
         setupDrawer();
         setupDrawerContent();
@@ -80,9 +99,21 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        deleteBtn = (Button) findViewById(R.id.delete_btn);
+        selectAllBtn = (Button) findViewById(R.id.select_all_btn);
+        mIncomeTextView = (TextView) findViewById(income_textview);
+        mCostTextView = (TextView) findViewById(R.id.cost_textview);
+    }
+
+    private String getCurrentTime(){
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());
+        String currentTime = formatter.format(curDate);
+        return currentTime;
     }
 
     private void setupToolBar(){
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -103,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDatasFromDataBase() {
-        Cursor cursor = mDataBase.query("Account",null,null,null,null,null,null);
+        Cursor cursor = mDataBase.query("Account", null, "time LIKE ?", new String[]{mCurrentYearAndMonth+"%"}, null, null, null);
         if (cursor.moveToFirst()){
             do{
                 Account account = new Account();
@@ -117,6 +148,20 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
     }
 
+    private void setIncomeAndCost(){
+        mIncome = 0;
+        mCost = 0;
+        for (Account account : accounts){
+            if (account.getType() == Account.TYPE_INCOME){
+                mIncome += account.getCost();
+            } else {
+                mCost += account.getCost();
+            }
+        }
+        mIncomeTextView.setText(mCurrentYearAndMonth.substring(5, 7) + "月收入" + "\n" + String.valueOf(mIncome));
+        mCostTextView.setText(mCurrentYearAndMonth.substring(5, 7) + "月支出" + "\n" + String.valueOf(mCost));
+    }
+
     private void setupRecylerView() {
         adapter = new AccountAdapter(MainActivity.this,accounts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -125,13 +170,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemLongClick(View view, final int position) {
                 new AlertDialog.Builder(MainActivity.this)
-                        .setItems(new String[]{"删除数据", "更新数据"}, new DialogInterface.OnClickListener() {
+                        .setItems(new String[]{"删除数据", "更改数据", "批量删除"}, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (which == 0){
                                     deleteData(position);
                                 } else if (which == 1){
                                     updateData(position);
+                                } else if (which == 2){
+                                    deleteDataInBatches();
                                 }
                             }
                         })
@@ -191,20 +238,88 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 2000){
-            ArrayList<Account> newAccounts = (ArrayList<Account>) data.getSerializableExtra("newAccounts");
-            for (Account account : newAccounts){
-                Log.d("out",account.getInformation());
-                accounts.add(account);
+    private void deleteDataInBatches(){
+        isShowCheckBox = true;
+        for (Account account : accounts){
+            account.setShowCheckBox(true);
+        }
+        adapter.notifyDataSetChanged();
+        if (selectedAccounts == null){
+            selectedAccounts = new ArrayList<Account>();
+        }
+        adapter.setOnItemIsCheckedListener(new AccountAdapter.OnItemIsCheckedListener() {
+            @Override
+            public void onItemIsChecked(Account account) {
+                if (account.getIsCheck() && !selectedAccounts.contains(account)){
+                    selectedAccounts.add(account);
+                } else if (!account.getIsCheck() && selectedAccounts.contains(account)){
+                    selectedAccounts.remove(account);
+                }
+            }
+        });
+        deleteBtn.setVisibility(View.VISIBLE);
+        selectAllBtn.setVisibility(View.VISIBLE);
+        selectAllBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isSelectAll){
+                    for(Account account : accounts){
+                        account.setIsCheck(true);
+                        if (!selectedAccounts.contains(account)){
+                            selectedAccounts.add(account);
+                        }
+                    }
+                    isSelectAll = false;
+                } else {
+                    for(Account account : accounts){
+                        account.setIsCheck(false);
+                        if (!selectedAccounts.contains(account)){
+                            selectedAccounts.remove(account);
+                        }
+                    }
+                    isSelectAll = true;
+                }
                 adapter.notifyDataSetChanged();
             }
+        });
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedAccounts != null){
+                    for (Account account : selectedAccounts){
+                        String time = account.getTime();
+                        mDataBase.delete("Account","time == ?",new String[]{time});
+                        if (accounts.contains(account)){
+                            accounts.remove(account);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    deleteBtn.setVisibility(View.GONE);
+                    selectAllBtn.setVisibility(View.GONE);
+                    for (Account account : accounts){
+                        account.setShowCheckBox(false);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
 
-            recyclerView.smoothScrollToPosition(accounts.size()-1);
-        }
+            }
+        });
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == 2000){
+//            ArrayList<Account> newAccounts = (ArrayList<Account>) data.getSerializableExtra("newAccounts");
+//            for (Account account : newAccounts){
+//                Log.d("out",account.getInformation());
+//                accounts.add(account);
+//                adapter.notifyDataSetChanged();
+//            }
+//
+//            recyclerView.smoothScrollToPosition(accounts.size()-1);
+//        }
+//    }
 
     private void setupDrawer() {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar, R.string.open,R.string.close){
@@ -237,6 +352,8 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(alarmIntent);
                         break;
                     case R.id.nav_setting:
+                        Intent settingIntent = new Intent(MainActivity.this,SettingActivity.class);
+                        startActivity(settingIntent);
                         break;
                     case R.id.nav_about:
                         break;
@@ -245,5 +362,33 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        ArrayList<Account> newAccounts = (ArrayList<Account>) intent.getSerializableExtra("newAccounts");
+        for (Account account : newAccounts){
+            Log.d("out",account.getInformation());
+            accounts.add(account);
+            adapter.notifyDataSetChanged();
+        }
+
+        recyclerView.smoothScrollToPosition(accounts.size()-1);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isShowCheckBox){
+            selectedAccounts.clear();
+            for (Account account : accounts){
+                account.setShowCheckBox(false);
+            }
+            adapter.notifyDataSetChanged();
+            deleteBtn.setVisibility(View.GONE);
+            selectAllBtn.setVisibility(View.GONE);
+            isShowCheckBox = false;
+        } else {
+            super.onBackPressed();
+        }
     }
 }

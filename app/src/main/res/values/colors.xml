@@ -4,6 +4,23 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="blue">#2196F3</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="red">#ff0000</color>
+    <color name="divider_line">#BDBDBD</color>
     <color name="costColor">#E91E63</color>
     <color name="incomeColor">#4CAF50</color>
+
+    <color name="tagColor0">#E91E63</color>
+    <color name="tagColor1">#FF9800</color>
+    <color name="tagColor2">#ffff00</color>
+    <color name="tagColor3">#8bc34a</color>
+    <color name="tagColor4">#00bcd4</color>
+    <color name="tagColor5">#03a9f4</color>
+    <color name="tagColor6">#673ab7</color>
+    <color name="tagColor7">#795548</color>
+    <color name="tagColor8">#ec407a</color>
+    <color name="tagColor9">#e51c23</color>
+    <color name="tagColor10">#5677fc</color>
 </resources>

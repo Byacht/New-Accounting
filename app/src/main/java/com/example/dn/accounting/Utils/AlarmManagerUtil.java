@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.icu.util.Calendar;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.dn.accounting.Receiver.AlarmReceiver;
 
@@ -23,7 +22,7 @@ public class AlarmManagerUtil {
     public static void setAlarmTime(Context context,Intent intent){
         PendingIntent pi = PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        alarmManager.setWindow(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+5000,10,pi);
+        alarmManager.setWindow(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+ONE_DAY,10,pi);
     }
 
     public static void setAlarm(Context context, int alarmTime){

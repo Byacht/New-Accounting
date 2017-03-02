@@ -17,4 +17,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="background">
+        <item name="android:background">@color/yellow</item>
+    </style>
+
 </resources>

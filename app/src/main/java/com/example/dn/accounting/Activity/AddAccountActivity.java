@@ -57,14 +57,20 @@ public class AddAccountActivity extends AppCompatActivity {
         findViewById(R.id.add_cost).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddDialog(Account.TYPE_COST);
+//                showAddDialog(Account.TYPE_COST);
+                Intent intent = new Intent(AddAccountActivity.this, AddCostActivity.class);
+                intent.putExtra("TYPE", Account.TYPE_COST);
+                startActivity(intent);
             }
         });
 
         findViewById(R.id.add_income).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddDialog(Account.TYPE_INCOME);
+//                showAddDialog(Account.TYPE_INCOME);
+                Intent intent = new Intent(AddAccountActivity.this, AddCostActivity.class);
+                intent.putExtra("TYPE", Account.TYPE_INCOME);
+                startActivity(intent);
             }
         });
     }

@@ -19,4 +19,8 @@
         <attr name="type" format="string"/>
         <attr name="color" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="PieChartView">
+        <attr name="pietext" format="string"/>
+    </declare-styleable>
 </resources>

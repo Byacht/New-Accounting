@@ -37,18 +37,10 @@ public class AlarmActivity extends AppCompatActivity {
         mToggleButton = (ToggleButton) findViewById(R.id.toggleButton);
         mAlarmTimeText = (TextView) findViewById(R.id.alarmTimeText);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("alarm",MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = getSharedPreferences("alarm",MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        boolean isAlarmSet = sharedPreferences.getBoolean("isAlarmSet",false);
-        final int alarmTime = sharedPreferences.getInt("alarmTime",0);
-
-        mAlarmTimeText.setText(alarmTime+":00");
-
-        if (isAlarmSet){
-            mToggleButton.setToggleOn();
-            mAlarmTimeText.setVisibility(View.VISIBLE);
-        }
+        initAlarm(sharedPreferences);
 
         mToggleButton.setOnToggleChanged(new ToggleButton.OnToggleChanged() {
             @Override
@@ -77,7 +69,7 @@ public class AlarmActivity extends AppCompatActivity {
             public void onClick(View v) {
                 new AlertDialog.Builder(AlarmActivity.this)
                         .setTitle("请选择提醒时间")
-                        .setSingleChoiceItems(mTime, alarmTime, new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(mTime, sharedPreferences.getInt("alarmTime",0), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d("out","选择了"+which+"点");
@@ -106,5 +98,17 @@ public class AlarmActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void initAlarm(SharedPreferences sharedPreferences) {
+        boolean isAlarmSet = sharedPreferences.getBoolean("isAlarmSet",false);
+        int alarmTime = sharedPreferences.getInt("alarmTime",0);
+
+        mAlarmTimeText.setText(alarmTime+":00");
+
+        if (isAlarmSet){
+            mToggleButton.setToggleOn();
+            mAlarmTimeText.setVisibility(View.VISIBLE);
+        }
     }
 }
