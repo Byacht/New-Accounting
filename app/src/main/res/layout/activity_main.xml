@@ -27,9 +27,76 @@
                     android:id="@+id/toolbar_main"
                     android:layout_width="match_parent"
                     android:layout_height="?android:attr/actionBarSize"
-                    android:background="@color/colorPrimary"
-                    style="@style/MaterialAnimations">
+                    android:background="@color/blue">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="我的账单"
+                        android:textSize="18sp"
+                        android:textColor="@color/white"/>
+                    <Button
+                        android:id="@+id/select_all_btn"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:layout_margin="4dp"
+                        android:text="全选"
+                        android:textSize="15sp"
+                        android:visibility="gone"
+                        android:background="@color/yellow"/>
+                    <Button
+                        android:id="@+id/delete_btn"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="4dp"
+                        android:layout_toLeftOf="@id/select_all_btn"
+                        android:text="删除"
+                        android:textSize="15sp"
+                        android:visibility="gone"
+                        android:background="@color/yellow"/>
+
                 </android.support.v7.widget.Toolbar>
+
+                <LinearLayout
+                    android:id="@+id/cost_income_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@color/blue"
+                    android:layout_below="@id/toolbar_main">
+                    <TextView
+                        android:id="@+id/income_textview"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="收入\n200"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:padding="8dp"
+                        android:gravity="center"/>
+                    <ImageView
+                        android:layout_width="11dp"
+                        android:layout_height="40dp"
+                        android:src="@color/white"
+                        android:padding="5dp"
+                        android:layout_gravity="center"/>
+                    <TextView
+                        android:id="@+id/cost_textview"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="支出\n200"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:padding="8dp"
+                        android:gravity="center"/>
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/add"
@@ -47,7 +114,7 @@
                     android:id="@+id/recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/toolbar_main"
+                    android:layout_below="@id/cost_income_layout"
                     android:divider="#ffff0000"
                     android:dividerHeight="10dp"/>
             </RelativeLayout>

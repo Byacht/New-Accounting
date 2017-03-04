@@ -10,7 +10,27 @@ public class Account implements Serializable{
     private float cost;
     private String information;
     private String time;
+    private String tagName;
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
+
     private int type;
+    private boolean isCheck = false;
+    private boolean isShowCheckBox = false;
+
+    public boolean isShowCheckBox() {
+        return isShowCheckBox;
+    }
+
+    public void setShowCheckBox(boolean showCheckBox) {
+        isShowCheckBox = showCheckBox;
+    }
 
     public static final int TYPE_COST = 0;
     public static final int TYPE_INCOME = 1;
@@ -46,5 +66,13 @@ public class Account implements Serializable{
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public void setIsCheck(boolean isCheck) {
+        this.isCheck = isCheck;
+    }
+
+    public boolean getIsCheck(){
+        return isCheck;
     }
 }

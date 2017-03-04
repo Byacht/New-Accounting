@@ -15,6 +15,7 @@ public class AccountDataBase extends SQLiteOpenHelper {
             + "cost real,"
             + "information text,"
             + "time text,"
+            + "tag text,"
             + "type integer)";
 
     public AccountDataBase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -28,6 +29,7 @@ public class AccountDataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("drop table if exists Account");
+        onCreate(db);
     }
 }

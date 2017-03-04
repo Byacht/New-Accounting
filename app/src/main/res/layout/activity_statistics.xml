@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:statistics="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,54 +9,75 @@
         android:id="@+id/toolbar_statistics"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
-        android:background="@color/colorPrimary">
+        android:background="@color/blue">
     </android.support.v7.widget.Toolbar>
 
     <TextView
-        android:id="@+id/textview_statistics"
+        android:id="@+id/showtime_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="2016年11月"
-        android:textSize="20dp"
         android:gravity="center"
-        android:background="#BDBDBD"/>
+        android:text="2017-3"/>
 
-    <FrameLayout
+    <android.support.design.widget.TabLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/activity_statistics">
+        android:layout_height="wrap_content"
+        android:id="@+id/tabLayout"
+        app:tabMode="fixed"
+        app:tabGravity="fill">
+    </android.support.design.widget.TabLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+    </android.support.v4.view.ViewPager>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <com.example.dn.accounting.View.StatisticsView
                 android:id="@+id/cost_statistics"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
-                statistics:type="支出"
-                statistics:color="@color/costColor"/>
-
+                app:type="支出"
+                app:color="@color/costColor"/>
             <com.example.dn.accounting.View.StatisticsView
                 android:id="@+id/income_statistics"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
-                statistics:type="收入"
-                statistics:color="@color/incomeColor"/>
-
+                app:type="收入"
+                app:color="@color/incomeColor"/>
             <com.example.dn.accounting.View.StatisticsView
                 android:id="@+id/balance_statistics"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
-                statistics:type="结余"
-                statistics:color="@color/costColor"/>
+                app:type="结余"
+                app:color="@color/costColor"/>
+
+            <com.example.dn.accounting.View.PieChartView
+                android:id="@+id/pie_chart"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:pietext="支出"/>
+
+            <com.example.dn.accounting.View.PieChartView
+                android:id="@+id/pie_chart_income"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:pietext="收入"/>
         </LinearLayout>
 
-    </FrameLayout>
-
-
-
+    </ScrollView>
 
 </LinearLayout>

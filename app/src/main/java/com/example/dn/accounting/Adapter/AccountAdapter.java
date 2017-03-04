@@ -6,7 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
+import com.example.dn.accounting.Activity.MainActivity;
 import com.example.dn.accounting.View.AccountView;
 import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.R;
@@ -27,6 +30,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
     private int type;
 
     private OnItemLongClickListener onItemLongClickListener;
+    private OnItemIsCheckedListener onItemIsCheckedListener;
 
     public AccountAdapter(Context context,List<Account> accounts){
         this.context = context;
@@ -38,6 +42,10 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
         this.onItemLongClickListener = onItemLongClickListener;
     }
 
+    public void setOnItemIsCheckedListener(OnItemIsCheckedListener onItemIsCheckedListener){
+        this.onItemIsCheckedListener = onItemIsCheckedListener;
+    }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyViewHolder holder = new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.account_view,parent,false));
@@ -46,7 +54,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        Account account = accounts.get(position);
+        final Account account = accounts.get(position);
         cost = account.getCost();
         information = account.getInformation();
         time = account.getTime();
@@ -72,6 +80,33 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
                 return false;
             }
         });
+        if (account.isShowCheckBox()){
+            holder.checkBox.setVisibility(View.VISIBLE);
+        } else {
+            holder.checkBox.setVisibility(View.GONE);
+        }
+        if (holder.checkBox.getVisibility() == View.VISIBLE){
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked){
+                        account.setIsCheck(true);
+                    } else {
+                        account.setIsCheck(false);
+                    }
+                    if (onItemIsCheckedListener != null){
+                        onItemIsCheckedListener.onItemIsChecked(account);
+                    }
+                }
+            });
+        }
+        if (account.getIsCheck()){
+            holder.checkBox.setChecked(true);
+        } else {
+            holder.checkBox.setChecked(false);
+        }
+
+
     }
 
     @Override
@@ -87,14 +122,20 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
     class MyViewHolder extends RecyclerView.ViewHolder {
 
         AccountView accountView;
+        CheckBox checkBox;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             accountView = (AccountView) itemView.findViewById(R.id.account);
+            checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
         }
     }
 
     public interface OnItemLongClickListener{
         void onItemLongClick(View view,int position);
+    }
+
+    public interface OnItemIsCheckedListener{
+        void onItemIsChecked(Account account);
     }
 }

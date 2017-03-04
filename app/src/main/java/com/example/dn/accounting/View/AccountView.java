@@ -75,7 +75,7 @@ public class AccountView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        accountWidth = (float)(getWidth()*0.8);
+        accountWidth = (float)(getWidth()*0.9);
         accountHeight = (float)(accountWidth*0.8);
 
         Paint linePaint = new Paint();

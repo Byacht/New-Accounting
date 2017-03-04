@@ -21,7 +21,7 @@ public class DBManager {
 
     private DBManager(Context context){
         this.mContext = context;
-        mAccountDataBase = new AccountDataBase(context,"Account.db",null,1);
+        mAccountDataBase = new AccountDataBase(context,"Account.db",null,2);
         mDataBase = mAccountDataBase.getWritableDatabase();
     }
 
