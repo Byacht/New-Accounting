@@ -17,8 +17,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.AddAccountActivity"/>
-        <activity android:name=".Activity.Main2Activity">
-        </activity>
         <activity android:name=".Activity.StatisticsActivity"/>
         <activity android:name=".Activity.AlarmActivity"/>
         <activity android:name=".Activity.addAlarmInformation"/>

@@ -2,6 +2,7 @@ package com.example.dn.accounting.Activity;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -24,6 +25,7 @@ import com.example.dn.accounting.DataBase.DBManager;
 import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.Model.TagInformation;
 import com.example.dn.accounting.R;
+import com.example.dn.accounting.View.MyFragment;
 import com.example.dn.accounting.View.PieChartView;
 import com.example.dn.accounting.View.StatisticsView;
 
@@ -35,20 +37,30 @@ import java.util.List;
 public class StatisticsActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
+
+    private SQLiteDatabase mDataBase;
+    private String mCurrentYearAndMonth = "2017-03";
+
+    private TextView mShowTimeTextView;
+    private ViewPager viewPager;
+    private MyFragmentPagerAdapter adapter;
+    private TabLayout mTabLayout;
+    private int viewHeight;  //选择年月视图的高度
+    private boolean isSelected = false;  //是否处于选择时间的状态，若是，按下返回键将隐藏选择视图，否则退出Activity
+
     private StatisticsView all_cost;
     private StatisticsView all_income;
     private StatisticsView all_banlance;
-    private SQLiteDatabase mDataBase;
-    private List<Account> accounts;
-    private ArrayList<TagInformation> mCostTagInformations;
-    private ArrayList<TagInformation> mIncomeTagInformations;
     private float income = 0;
     private float cost = 0;
     private float balance;
-    private Spinner mSpinner;
+
+    private List<Account> accounts;
+    private ArrayList<TagInformation> mCostTagInformations;
+    private ArrayList<TagInformation> mIncomeTagInformations;
     private ArrayList<String> mCostTagNames;
     private ArrayList<String> mIncomeTagNames;
-    private String mCurrentYearAndMonth = "2017-03";
+
     private PieChartView mCostPieChartView;
     private PieChartView mIncomePieChartView;
 
@@ -57,44 +69,22 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), this);
-        viewPager.setAdapter(adapter);
+        initView();
+        setupToolBar();
+        setupTabLayout();
+        showStatisticsView();
+        makeStatisticsOfTag();
+        setupPieChart();
+    }
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                Log.d("out", "selected");
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewPager.getLayoutParams();
-                layoutParams.height = 100;
-                viewPager.setLayoutParams(layoutParams);
-            }
+    private void initView(){
+        viewHeight = 350;
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                Log.d("out", "unselected");
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewPager.getLayoutParams();
-                layoutParams.height = 0;
-                viewPager.setLayoutParams(layoutParams);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                Log.d("out", "reselected");
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewPager.getLayoutParams();
-                layoutParams.height = 100;
-                viewPager.setLayoutParams(layoutParams);
-            }
-        });
-
+        mShowTimeTextView = (TextView) findViewById(R.id.showtime_textview);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
         mCostPieChartView = (PieChartView) findViewById(R.id.pie_chart);
         mIncomePieChartView = (PieChartView) findViewById(R.id.pie_chart_income);
-
-        setupToolBar();
-        setupChooseTimeView();
-        showStatisticsView();
     }
 
     private void setupToolBar(){
@@ -112,13 +102,49 @@ public class StatisticsActivity extends AppCompatActivity {
         });
     }
 
-    private void showChooseTimeView(){
-//        FrameLayout layout = (FrameLayout) findViewById(R.id.activity_statistics);
-//        View view = LayoutInflater.from(this).inflate(R.layout.view_choose_time,null,false);
-//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP,RelativeLayout.TRUE);
-//        layout.addView(view,layoutParams);
+    private void setupTabLayout() {
+        adapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), this);
+        viewPager.setAdapter(adapter);
+        mTabLayout.setupWithViewPager(viewPager);
+        mTabLayout.setSelectedTabIndicatorColor(Color.alpha(0));
+        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                isSelected = true;
+                showChooseTimeLayout();
+                int index = viewPager.getCurrentItem();
+                /* 得到当前的fragment，通过接口回调响应fragment的点击事件 */
+                MyFragment myFragment = (MyFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + index);
+                myFragment.setOnShowTimeListener(new MyFragment.OnShowTime() {
+                    @Override
+                    public void showTime(String time) {
+                        mShowTimeTextView.setText("2017-01");
+                    }
+                });
+            }
 
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                isSelected = true;
+                showChooseTimeLayout();
+            }
+        });
+    }
+
+    private void showChooseTimeLayout() {
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewPager.getLayoutParams();
+        layoutParams.height = viewHeight;
+        viewPager.setLayoutParams(layoutParams);
+    }
+
+    private void hideChooseTimeLayout(){
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewPager.getLayoutParams();
+        layoutParams.height = 0;
+        viewPager.setLayoutParams(layoutParams);
     }
 
     private void showStatisticsView() {
@@ -141,9 +167,6 @@ public class StatisticsActivity extends AppCompatActivity {
         }
         all_banlance.setCost(balance);
         all_banlance.setLength(Math.abs(balance)/(cost+income));
-
-        mCostPieChartView.setTagInformation(mCostTagInformations);
-        mIncomePieChartView.setTagInformation(mIncomeTagInformations);
     }
 
     private void calculateCostAndIncome() {
@@ -151,9 +174,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
         for (Account account:accounts){
             if (account.getType()==Account.TYPE_COST){
-                cost+=account.getCost();
+                cost += account.getCost();
             } else if (account.getType()==Account.TYPE_INCOME){
-                income+=account.getCost();
+                income += account.getCost();
             }
         }
     }
@@ -175,61 +198,32 @@ public class StatisticsActivity extends AppCompatActivity {
         }
         cursor.close();
 
-        doStatisticsOfTag();
     }
 
-    private void setupChooseTimeView() {
-
-    }
-
-    private void doStatisticsOfTag(){
+    private void makeStatisticsOfTag(){
         for(Account account : accounts){
             if (account.getType() == Account.TYPE_COST){
-                if (!mCostTagNames.contains(account.getTagName())){
-                    mCostTagNames.add(account.getTagName());
-                    Log.d("out", "tagName:" + account.getTagName() + "cost:" + account.getCost());
-                    TagInformation tagInformation = new TagInformation();
-                    tagInformation.setTagName(account.getTagName());
-                    tagInformation.setTagCost(account.getCost());
-                    mCostTagInformations.add(tagInformation);
-                } else {
-                    int position = mCostTagNames.indexOf(account.getTagName());
-                    Log.d("out", "exist tagName:" + account.getTagName() + "cost:" + account.getCost());
-                    TagInformation tagInformation = mCostTagInformations.get(position);
-                    tagInformation.setTagCost(tagInformation.getTagCost() + account.getCost());
-                    mCostTagInformations.set(position, tagInformation);
-                }
+                addTagInformationsToList(account, mCostTagNames, mCostTagInformations);
             } else {
-                if (!mIncomeTagNames.contains(account.getTagName())){
-                    mIncomeTagNames.add(account.getTagName());
-                    TagInformation tagInformation = new TagInformation();
-                    tagInformation.setTagName(account.getTagName());
-                    tagInformation.setTagCost(account.getCost());
-                    mIncomeTagInformations.add(tagInformation);
-                } else {
-                    int position = mIncomeTagNames.indexOf(account.getTagName());
-                    TagInformation tagInformation = mIncomeTagInformations.get(position);
-                    tagInformation.setTagCost(tagInformation.getTagCost() + account.getCost());
-                    mIncomeTagInformations.set(position, tagInformation);
-                }
+                addTagInformationsToList(account, mIncomeTagNames, mIncomeTagInformations);
             }
         }
     }
 
-//    private void addToTagInformationsList(Account account) {
-//        if (!mTagNames.contains(account.getTagName())){
-//            mTagNames.add(account.getTagName());
-//            TagInformation tagInformation = new TagInformation();
-//            tagInformation.setTagName(account.getTagName());
-//            tagInformation.setTagCost(account.getCost());
-//            mTagInformations.add(tagInformation);
-//        } else {
-//            int position = mTagNames.indexOf(account.getTagName());
-//            TagInformation tagInformation = mTagInformations.get(position);
-//            tagInformation.setTagCost(tagInformation.getTagCost() + account.getCost());
-//            mTagInformations.set(position, tagInformation);
-//        }
-//    }
+    private void addTagInformationsToList(Account account, ArrayList<String> tagNames, ArrayList<TagInformation> tagInformations) {
+        if (!tagNames.contains(account.getTagName())){
+            tagNames.add(account.getTagName());
+            TagInformation tagInformation = new TagInformation();
+            tagInformation.setTagName(account.getTagName());
+            tagInformation.setTagCost(account.getCost());
+            tagInformations.add(tagInformation);
+        } else {
+            int position = tagNames.indexOf(account.getTagName());
+            TagInformation tagInformation = tagInformations.get(position);
+            tagInformation.setTagCost(tagInformation.getTagCost() + account.getCost());
+            tagInformations.set(position, tagInformation);
+        }
+    }
 
     private void setupDataBase() {
         mDataBase = DBManager.getInstance(StatisticsActivity.this).getDataBase();
@@ -238,5 +232,20 @@ public class StatisticsActivity extends AppCompatActivity {
         mIncomeTagNames = new ArrayList<String>();
         mCostTagInformations = new ArrayList<TagInformation>();
         mCostTagNames = new ArrayList<String>();
+    }
+
+    private void setupPieChart() {
+        mCostPieChartView.setTagInformation(mCostTagInformations);
+        mIncomePieChartView.setTagInformation(mIncomeTagInformations);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isSelected){
+            hideChooseTimeLayout();
+            isSelected = false;
+        } else {
+            super.onBackPressed();
+        }
     }
 }

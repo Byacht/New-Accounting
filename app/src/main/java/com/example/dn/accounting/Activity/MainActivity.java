@@ -45,25 +45,31 @@ import static com.example.dn.accounting.R.id.income_textview;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView add;
     private Toolbar toolbar;
-    private List<Account> accounts;
-    private List<Account> selectedAccounts;
-    private RecyclerView recyclerView;
-    private AccountAdapter adapter;
-    private SQLiteDatabase mDataBase;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private Button deleteBtn;
-    private Button selectAllBtn;
-    private boolean isShowCheckBox;
-    private boolean isSelectAll = true;
+
+    private String mCurrentYearAndMonth;
     private TextView mIncomeTextView;
     private TextView mCostTextView;
     private float mIncome;
     private float mCost;
-    private String mCurrentYearAndMonth;
+
+    private SQLiteDatabase mDataBase;
+    private List<Account> accounts;
+
+    private RecyclerView recyclerView;
+    private AccountAdapter adapter;
+
+    private ActionBarDrawerToggle actionBarDrawerToggle;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+
+    private List<Account> selectedAccounts;  //记录被选中的accounts
+    private Button deleteBtn;
+    private Button selectAllBtn;
+    private boolean isShowCheckBox;  //标记checkBox是否显示，显示时，按下返回键，将隐藏checkBox，而不会退出Activity
+    private boolean isSelectAll = true;
+
+    private ImageView add;  //添加账单按钮
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +77,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
-        mCurrentYearAndMonth = getCurrentTime().substring(0, 7);
         setupToolBar();
         setupWindowAnimations();
         setupDataBase();
         getDatasFromDataBase();
-        setIncomeAndCost();
+        setIncomeAndCost();  //计算当月的收入和支出，并显示在textview中
         setupRecylerView();
         setupDrawer();
         setupDrawerContent();
@@ -120,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupWindowAnimations() {
-        // Re-enter transition is executed when returning to this activity
         Slide slideTransition = new Slide();
         slideTransition.setSlideEdge(Gravity.LEFT);
         slideTransition.setDuration(500);
@@ -134,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDatasFromDataBase() {
-        Cursor cursor = mDataBase.query("Account", null, "time LIKE ?", new String[]{mCurrentYearAndMonth+"%"}, null, null, null);
+        mCurrentYearAndMonth = getCurrentTime().substring(0, 7);  //取得当前年月，查找数据库中符合这个时间的数据
+        Cursor cursor = mDataBase.query("Account", null, "time LIKE ?", new String[]{mCurrentYearAndMonth + "%"}, null, null, null);
         if (cursor.moveToFirst()){
             do{
                 Account account = new Account();
@@ -306,21 +311,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == 2000){
-//            ArrayList<Account> newAccounts = (ArrayList<Account>) data.getSerializableExtra("newAccounts");
-//            for (Account account : newAccounts){
-//                Log.d("out",account.getInformation());
-//                accounts.add(account);
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            recyclerView.smoothScrollToPosition(accounts.size()-1);
-//        }
-//    }
-
     private void setupDrawer() {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar, R.string.open,R.string.close){
             @Override
@@ -368,7 +358,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         ArrayList<Account> newAccounts = (ArrayList<Account>) intent.getSerializableExtra("newAccounts");
         for (Account account : newAccounts){
-            Log.d("out",account.getInformation());
             accounts.add(account);
             adapter.notifyDataSetChanged();
         }

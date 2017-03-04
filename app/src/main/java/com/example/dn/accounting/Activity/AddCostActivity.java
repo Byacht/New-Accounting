@@ -31,21 +31,24 @@ import java.util.List;
 
 public class AddCostActivity extends AppCompatActivity {
 
+    private ImageView mImageView;
+    private EditText informationText;
+    private EditText costText;
+
     private RecyclerView tagChoiceView;
     private TagChoiceAdapter mAdapter;
+
+    private int type;  //收入or支出
     private ArrayList<Tag> tags;
-    private ImageView mImageView;
     private SQLiteDatabase mDataBase;
     private float cost;
     private String information;
     private String time;
-    private Button mCommitBtn;
+
     private Intent intent;
     private List<Account> newAccounts;
-    private int type;
-    private EditText informationText;
-    private EditText costText;
     private int tagPosition;
+    private Button mCommitBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +56,14 @@ public class AddCostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_cost);
 
         type = getIntent().getIntExtra("TYPE", Account.TYPE_COST);
-
-        mImageView = (ImageView) findViewById(R.id.tag_imageview);
-
-        tagChoiceView = (RecyclerView) findViewById(R.id.tag_view);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,5);
-        tagChoiceView.setLayoutManager(gridLayoutManager);
-
         tags = new ArrayList<Tag>();
         if (type == Account.TYPE_COST){
             initCostTags();
         } else {
             initIncomeTags();
         }
+
+        initView();
 
         mAdapter = new TagChoiceAdapter(this, tags);
         mAdapter.setOnItemClickListener(new TagChoiceAdapter.OnItemClickListener() {
@@ -77,14 +75,10 @@ public class AddCostActivity extends AppCompatActivity {
                 tagPosition = position;
             }
         });
+        tagChoiceView.setLayoutManager(new GridLayoutManager(this,5));
         tagChoiceView.setAdapter(mAdapter);
 
         setupDataBase();
-
-        informationText = (EditText) findViewById(R.id.information_edittext);
-        costText = (FormEditText) findViewById(R.id.cost_edittext);
-
-        mCommitBtn = (Button) findViewById(R.id.commit_btn);
         mCommitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +86,14 @@ public class AddCostActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void initView(){
+        mImageView = (ImageView) findViewById(R.id.tag_imageview);
+        informationText = (EditText) findViewById(R.id.information_edittext);
+        costText = (FormEditText) findViewById(R.id.cost_edittext);
+        tagChoiceView = (RecyclerView) findViewById(R.id.tag_view);
+        mCommitBtn = (Button) findViewById(R.id.commit_btn);
     }
 
     private void commitInformation(int type, int tagPosition) {

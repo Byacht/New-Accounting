@@ -12,6 +12,13 @@
         android:background="@color/blue">
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:id="@+id/showtime_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="2017-3"/>
+
     <android.support.design.widget.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
