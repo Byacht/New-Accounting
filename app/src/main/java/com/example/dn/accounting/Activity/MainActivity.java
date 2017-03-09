@@ -21,7 +21,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
@@ -255,7 +257,44 @@ public class MainActivity extends AppCompatActivity {
     private void updateData(final int position){
         final View view = LayoutInflater.from(this).inflate(R.layout.add_account_dialog,null);
         final EditText informationText = (EditText) view.findViewById(R.id.information_edittext);
-        final FormEditText costText = (FormEditText) view.findViewById(R.id.cost_edittext);
+        final EditText costText = (EditText) view.findViewById(R.id.cost_edittext);
+        costText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().contains(".")) {
+                    if (s.length() - 1 - s.toString().indexOf(".") > 1) {
+                        s = s.toString().subSequence(0,
+                                s.toString().indexOf(".") + 2);
+                        costText.setText(s);
+                        costText.setSelection(s.length());
+                    }
+                }
+                if (s.toString().trim().substring(0).equals(".")) {
+                    s = "0" + s;
+                    costText.setText(s);
+                    costText.setSelection(2);
+                }
+
+                if (s.toString().startsWith("0")
+                        && s.toString().trim().length() > 1) {
+                    if (!s.toString().substring(1, 2).equals(".")) {
+                        costText.setText(s.subSequence(0, 1));
+                        costText.setSelection(1);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         final String time = accounts.get(position).getTime();
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle("请输入信息")
@@ -372,8 +411,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         adapter.notifyDataSetChanged();
-                        deleteBtn.setVisibility(View.GONE);
-                        selectAllBtn.setVisibility(View.GONE);
+                        longPressLayout.setVisibility(View.GONE);
                         for (Account account : accounts){
                             account.setShowCheckBox(false);
                         }

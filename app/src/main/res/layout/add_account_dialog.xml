@@ -13,15 +13,12 @@
         android:hint="交易信息"/>
 
 
-    <com.andreabaccega.widget.FormEditText
-        app:testType="numeric"
-        app:testErrorString="text should be number"
-        app:emptyErrorString="text can't be empty"
+    <EditText
         android:id="@+id/cost_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:hint="金额（元）"
-        android:inputType="number"/>
+        android:inputType="numberDecimal"/>
 
 </LinearLayout>

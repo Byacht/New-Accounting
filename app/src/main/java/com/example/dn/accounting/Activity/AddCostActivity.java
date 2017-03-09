@@ -9,9 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -144,7 +146,44 @@ public class AddCostActivity extends AppCompatActivity {
         }
         informationText = (EditText) findViewById(R.id.information_edittext);
 //        informationText.setFilters(new InputFilter[]{filter});
-        costText = (FormEditText) findViewById(R.id.cost_edittext);
+        costText = (EditText) findViewById(R.id.cost_edittext);
+        costText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().contains(".")) {
+                    if (s.length() - 1 - s.toString().indexOf(".") > 1) {
+                        s = s.toString().subSequence(0,
+                                s.toString().indexOf(".") + 2);
+                        costText.setText(s);
+                        costText.setSelection(s.length());
+                    }
+                }
+                if (s.toString().trim().substring(0).equals(".")) {
+                    s = "0" + s;
+                    costText.setText(s);
+                    costText.setSelection(2);
+                }
+
+                if (s.toString().startsWith("0")
+                        && s.toString().trim().length() > 1) {
+                    if (!s.toString().substring(1, 2).equals(".")) {
+                        costText.setText(s.subSequence(0, 1));
+                        costText.setSelection(1);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         tagChoiceView = (RecyclerView) findViewById(R.id.tag_view);
         mCommitBtn = (Button) findViewById(R.id.commit_btn);
     }

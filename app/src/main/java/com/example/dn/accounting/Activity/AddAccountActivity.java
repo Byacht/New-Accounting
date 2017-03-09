@@ -78,7 +78,7 @@ public class AddAccountActivity extends AppCompatActivity {
     private void showAddDialog(final int type) {
         final View view = LayoutInflater.from(AddAccountActivity.this).inflate(R.layout.add_account_dialog,null);
         final EditText informationText = (EditText) view.findViewById(R.id.information_edittext);
-        final FormEditText costText = (FormEditText) view.findViewById(R.id.cost_edittext);
+        final EditText costText = (EditText) view.findViewById(R.id.cost_edittext);
         if (intent == null || newAccounts == null){
             intent = new Intent();
             newAccounts = new ArrayList<Account>();
