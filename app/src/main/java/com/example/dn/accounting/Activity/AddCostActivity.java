@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -47,8 +49,52 @@ public class AddCostActivity extends AppCompatActivity {
 
     private Intent intent;
     private List<Account> newAccounts;
-    private int tagPosition;
+    private int tagPosition = 0;
     private Button mCommitBtn;
+
+//    private final int maxLen = 16;
+//    private InputFilter filter = new InputFilter() {
+//
+//        @Override
+//        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+//            int dindex = 0;
+//            int count = 0;
+//
+//            while (count <= maxLen && dindex < dest.length()) {
+//                Log.d("out", "first count:" + count);
+//                Log.d("out", "dindex:" + dindex);
+//                char c = dest.charAt(dindex++);
+//                if (c < 128) {
+//                    count = count + 1;
+//                } else {
+//                    count = count + 2;
+//                }
+//            }
+//
+//            if (count > maxLen) {
+//                return dest.subSequence(0, dindex - 1);
+//            }
+//
+//            return dest.subSequence(0, dindex);
+//
+//            int sindex = 0;
+//            while (count <= maxLen && sindex < source.length()) {
+//                Log.d("out", "second");
+//                char c = source.charAt(sindex++);
+//                if (c < 128) {
+//                    count = count + 1;
+//                } else {
+//                    count = count + 2;
+//                }
+//            }
+//
+//            if (count > maxLen) {
+//                sindex--;
+//            }
+//
+//            return source.subSequence(0, sindex);
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +135,15 @@ public class AddCostActivity extends AppCompatActivity {
     }
 
     private void initView(){
+        Resources resources = getResources();
         mImageView = (ImageView) findViewById(R.id.tag_imageview);
+        if (type == Account.TYPE_COST) {
+            mImageView.setImageDrawable(resources.getDrawable(R.drawable.food));
+        } else {
+            mImageView.setImageDrawable(resources.getDrawable(R.drawable.wages));
+        }
         informationText = (EditText) findViewById(R.id.information_edittext);
+//        informationText.setFilters(new InputFilter[]{filter});
         costText = (FormEditText) findViewById(R.id.cost_edittext);
         tagChoiceView = (RecyclerView) findViewById(R.id.tag_view);
         mCommitBtn = (Button) findViewById(R.id.commit_btn);

@@ -1,11 +1,14 @@
 package com.example.dn.accounting.Activity;
 
 import android.app.ActivityOptions;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.support.annotation.NonNull;
@@ -25,10 +28,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.andreabaccega.widget.FormEditText;
 import com.example.dn.accounting.DataBase.DBManager;
@@ -36,6 +43,8 @@ import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.Adapter.AccountAdapter;
 import com.example.dn.accounting.DataBase.AccountDataBase;
 import com.example.dn.accounting.R;
+import com.example.dn.accounting.Utils.TimeUtil;
+import com.example.dn.accounting.View.YearMonthPickerDialog;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     private String mCurrentYearAndMonth;
+    private String mSearchYear;
+    private String mSearchMonth;
+    private LinearLayout mIncomeAndCostLayout;
     private TextView mIncomeTextView;
     private TextView mCostTextView;
     private float mIncome;
@@ -64,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
 
     private List<Account> selectedAccounts;  //记录被选中的accounts
+    private LinearLayout longPressLayout;
     private Button deleteBtn;
     private Button selectAllBtn;
     private boolean isShowCheckBox;  //标记checkBox是否显示，显示时，按下返回键，将隐藏checkBox，而不会退出Activity
@@ -86,6 +99,28 @@ public class MainActivity extends AppCompatActivity {
         setupDrawer();
         setupDrawerContent();
 
+        mIncomeAndCostLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new YearMonthPickerDialog(MainActivity.this, android.app.AlertDialog.THEME_HOLO_LIGHT,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                mSearchYear = year + "";
+                                month += 1;
+                                mSearchMonth = month + "";
+                                if (mSearchMonth.length() == 1){
+                                    mSearchMonth = "0" + mSearchMonth;
+                                }
+                                mCurrentYearAndMonth = mSearchYear + "-" + mSearchMonth;
+                                notifyTimeChange();
+                            }
+                        },
+                Integer.valueOf(mSearchYear), Integer.valueOf(mSearchMonth) - 1, 1)
+                .show();
+            }
+        });
+
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,8 +141,13 @@ public class MainActivity extends AppCompatActivity {
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         deleteBtn = (Button) findViewById(R.id.delete_btn);
         selectAllBtn = (Button) findViewById(R.id.select_all_btn);
+        mIncomeAndCostLayout = (LinearLayout) findViewById(R.id.cost_income_layout);
         mIncomeTextView = (TextView) findViewById(income_textview);
         mCostTextView = (TextView) findViewById(R.id.cost_textview);
+        mCurrentYearAndMonth = getCurrentTime().substring(0, 7);  //取得当前年月，查找数据库中符合这个时间的数据
+        mSearchYear = mCurrentYearAndMonth.substring(0, 4);
+        mSearchMonth = mCurrentYearAndMonth.substring(5, 7);
+        longPressLayout = (LinearLayout) findViewById(R.id.longpress_layout);
     }
 
     private String getCurrentTime(){
@@ -138,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDatasFromDataBase() {
-        mCurrentYearAndMonth = getCurrentTime().substring(0, 7);  //取得当前年月，查找数据库中符合这个时间的数据
         Cursor cursor = mDataBase.query("Account", null, "time LIKE ?", new String[]{mCurrentYearAndMonth + "%"}, null, null, null);
         if (cursor.moveToFirst()){
             do{
@@ -195,11 +234,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void deleteData(int position){
-        String time = accounts.get(position).getTime();
-        mDataBase.delete("Account","time == ?",new String[]{time});
-        accounts.remove(position);
-        adapter.notifyItemChanged(position);
+    private void deleteData(final int position){
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("删除")
+                .setMessage("确认删除所选条目？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String time = accounts.get(position).getTime();
+                        mDataBase.delete("Account","time == ?",new String[]{time});
+                        accounts.remove(position);
+                        adapter.notifyItemChanged(position);
+                        setIncomeAndCost();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private void updateData(final int position){
@@ -237,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                         mDataBase.update("Account",values,"time == ?",new String[]{time});
                         accounts.set(position,account);
                         adapter.notifyItemChanged(position);
+                        setIncomeAndCost();
                     }
                 })
                 .setNegativeButton("取消",null)
@@ -262,8 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        deleteBtn.setVisibility(View.VISIBLE);
-        selectAllBtn.setVisibility(View.VISIBLE);
+        longPressLayout.setVisibility(View.VISIBLE);
         selectAllBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     for(Account account : accounts){
                         account.setIsCheck(false);
-                        if (!selectedAccounts.contains(account)){
+                        if (selectedAccounts.contains(account)){
                             selectedAccounts.remove(account);
                         }
                     }
@@ -290,25 +340,63 @@ public class MainActivity extends AppCompatActivity {
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedAccounts != null){
-                    for (Account account : selectedAccounts){
-                        String time = account.getTime();
-                        mDataBase.delete("Account","time == ?",new String[]{time});
-                        if (accounts.contains(account)){
-                            accounts.remove(account);
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                    deleteBtn.setVisibility(View.GONE);
-                    selectAllBtn.setVisibility(View.GONE);
-                    for (Account account : accounts){
-                        account.setShowCheckBox(false);
-                    }
-                    adapter.notifyDataSetChanged();
+                if (selectedAccounts != null && selectedAccounts.size() > 0){
+                    showAlertDialog();
+
+                } else {
+                    Toast.makeText(MainActivity.this, "请选择条目", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
+    }
+
+    private void showAlertDialog() {
+        TextView textView = new TextView(MainActivity.this);
+        textView.setGravity(Gravity.CENTER);
+        textView.setPadding(0, 10, 0, 0);
+        textView.setText("删除");
+        textView.setTextSize(18);
+        textView.setTextColor(Color.BLACK);
+        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                .setCustomTitle(textView)
+                .setMessage("确定删除所选条目？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        for (Account account : selectedAccounts){
+                            String time = account.getTime();
+                            mDataBase.delete("Account","time == ?",new String[]{time});
+                            if (accounts.contains(account)){
+                                accounts.remove(account);
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                        deleteBtn.setVisibility(View.GONE);
+                        selectAllBtn.setVisibility(View.GONE);
+                        for (Account account : accounts){
+                            account.setShowCheckBox(false);
+                        }
+                        adapter.notifyDataSetChanged();
+                        setIncomeAndCost();
+                        isShowCheckBox = false;
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create();
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setGravity(Gravity.BOTTOM);
+        dialog.show();
+    }
+
+    private void notifyTimeChange(){
+        accounts.clear();
+        getDatasFromDataBase();
+        setIncomeAndCost();
+        adapter.notifyDataSetChanged();
+        if (accounts.size() > 0){
+            recyclerView.smoothScrollToPosition(accounts.size()-1);
+        }
     }
 
     private void setupDrawer() {
@@ -356,13 +444,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        ArrayList<Account> newAccounts = (ArrayList<Account>) intent.getSerializableExtra("newAccounts");
-        for (Account account : newAccounts){
-            accounts.add(account);
-            adapter.notifyDataSetChanged();
-        }
+        if (mCurrentYearAndMonth.equals(TimeUtil.getCurrentTime().substring(0, 7))){
+            ArrayList<Account> newAccounts = (ArrayList<Account>) intent.getSerializableExtra("newAccounts");
+            for (Account account : newAccounts){
+                accounts.add(account);
+                adapter.notifyDataSetChanged();
+            }
 
-        recyclerView.smoothScrollToPosition(accounts.size()-1);
+            if (accounts.size() > 0){
+                recyclerView.smoothScrollToPosition(accounts.size()-1);
+            }
+        }
+        setIncomeAndCost();
     }
 
     @Override
@@ -373,8 +466,7 @@ public class MainActivity extends AppCompatActivity {
                 account.setShowCheckBox(false);
             }
             adapter.notifyDataSetChanged();
-            deleteBtn.setVisibility(View.GONE);
-            selectAllBtn.setVisibility(View.GONE);
+            longPressLayout.setVisibility(View.GONE);
             isShowCheckBox = false;
         } else {
             super.onBackPressed();

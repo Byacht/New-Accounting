@@ -15,7 +15,7 @@ import com.example.dn.accounting.R;
  * Created by dn on 2016/11/17.
  */
 
-public class MyFragment extends Fragment {
+public class MyFragment extends Fragment implements View.OnClickListener{
     private static final String ARGS_PAGE = "page";
     private int mPage;
     private TextView mTextView;
@@ -49,19 +49,67 @@ public class MyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
         if (mPage == 1){
+            view = null;
+        } else if (mPage == 2){
             view = inflater.inflate(R.layout.choose_month_layout,container,false);
-            mTextView = (TextView) view.findViewById(R.id.Jan);
-            mTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onShowTimeListener != null) {
-                        onShowTimeListener.showTime("2017-01");
-                    }
-                }
-            });
+            view.findViewById(R.id.Jan).setOnClickListener(this);
+            view.findViewById(R.id.Feb).setOnClickListener(this);
+            view.findViewById(R.id.Mar).setOnClickListener(this);
+            view.findViewById(R.id.Apr).setOnClickListener(this);
+            view.findViewById(R.id.May).setOnClickListener(this);
+            view.findViewById(R.id.Jun).setOnClickListener(this);
+            view.findViewById(R.id.Jul).setOnClickListener(this);
+            view.findViewById(R.id.Aug).setOnClickListener(this);
+            view.findViewById(R.id.Sept).setOnClickListener(this);
+            view.findViewById(R.id.Obt).setOnClickListener(this);
+            view.findViewById(R.id.Nov).setOnClickListener(this);
+            view.findViewById(R.id.Dec).setOnClickListener(this);
         } else {
             view = inflater.inflate(R.layout.choose_month_layout,container,false);
         }
         return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.Jan:
+                onShowTimeListener.showTime("01");
+                break;
+            case R.id.Feb:
+                onShowTimeListener.showTime("02");
+                break;
+            case R.id.Mar:
+                onShowTimeListener.showTime("03");
+                break;
+            case R.id.Apr:
+                onShowTimeListener.showTime("04");
+                break;
+            case R.id.May:
+                onShowTimeListener.showTime("05");
+                break;
+            case R.id.Jun:
+                onShowTimeListener.showTime("06");
+                break;
+            case R.id.Jul:
+                onShowTimeListener.showTime("07");
+                break;
+            case R.id.Aug:
+                onShowTimeListener.showTime("08");
+                break;
+            case R.id.Sept:
+                onShowTimeListener.showTime("09");
+                break;
+            case R.id.Obt:
+                onShowTimeListener.showTime("10");
+                break;
+            case R.id.Nov:
+                onShowTimeListener.showTime("11");
+                break;
+            case R.id.Dec:
+                onShowTimeListener.showTime("12");
+                break;
+            default: break;
+        }
     }
 }

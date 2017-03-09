@@ -36,31 +36,6 @@
                         android:text="我的账单"
                         android:textSize="18sp"
                         android:textColor="@color/white"/>
-                    <Button
-                        android:id="@+id/select_all_btn"
-                        android:layout_width="40dp"
-                        android:layout_height="30dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="center"
-                        android:layout_margin="4dp"
-                        android:text="全选"
-                        android:textSize="15sp"
-                        android:visibility="gone"
-                        android:background="@color/yellow"/>
-                    <Button
-                        android:id="@+id/delete_btn"
-                        android:layout_width="40dp"
-                        android:layout_height="30dp"
-                        android:gravity="center"
-                        android:layout_centerVertical="true"
-                        android:layout_margin="4dp"
-                        android:layout_toLeftOf="@id/select_all_btn"
-                        android:text="删除"
-                        android:textSize="15sp"
-                        android:visibility="gone"
-                        android:background="@color/yellow"/>
-
                 </android.support.v7.widget.Toolbar>
 
                 <LinearLayout
@@ -117,6 +92,40 @@
                     android:layout_below="@id/cost_income_layout"
                     android:divider="#ffff0000"
                     android:dividerHeight="10dp"/>
+
+                <LinearLayout
+                    android:id="@+id/longpress_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:visibility="gone"
+                    android:background="@drawable/framebackground">
+                    <Button
+                        android:id="@+id/select_all_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_margin="4dp"
+                        android:text="全选"
+                        android:textSize="15sp"
+                        android:background="@drawable/button_pressed"/>
+                    <ImageView
+                        android:layout_width="1dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:src="@color/divider_line"/>
+                    <Button
+                        android:id="@+id/delete_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_margin="4dp"
+                        android:text="删除"
+                        android:textSize="15sp"
+                        android:background="@drawable/button_pressed"/>
+                </LinearLayout>
             </RelativeLayout>
         </FrameLayout>
 

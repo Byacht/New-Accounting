@@ -1,22 +1,21 @@
 package com.example.dn.accounting.Activity;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.dn.accounting.Adapter.MyFragmentPagerAdapter;
@@ -25,11 +24,11 @@ import com.example.dn.accounting.DataBase.DBManager;
 import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.Model.TagInformation;
 import com.example.dn.accounting.R;
+import com.example.dn.accounting.Utils.TimeUtil;
 import com.example.dn.accounting.View.MyFragment;
 import com.example.dn.accounting.View.PieChartView;
 import com.example.dn.accounting.View.StatisticsView;
-
-import org.w3c.dom.Text;
+import com.example.dn.accounting.View.YearPickerDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,9 @@ public class StatisticsActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     private SQLiteDatabase mDataBase;
-    private String mCurrentYearAndMonth = "2017-03";
+    private String mSearchTime;
+    private String mSelectedYear;
+    private String mSelectedMonth;
 
     private TextView mShowTimeTextView;
     private ViewPager viewPager;
@@ -64,6 +65,8 @@ public class StatisticsActivity extends AppCompatActivity {
     private PieChartView mCostPieChartView;
     private PieChartView mIncomePieChartView;
 
+    private int mIndex = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,10 +78,23 @@ public class StatisticsActivity extends AppCompatActivity {
         showStatisticsView();
         makeStatisticsOfTag();
         setupPieChart();
+        findViewById(R.id.scrollView).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isSelected){
+                    hideChooseTimeLayout();
+                    isSelected = false;
+                }
+                return false;
+            }
+        });
     }
 
     private void initView(){
         viewHeight = 350;
+        mSearchTime = TimeUtil.getCurrentTime().substring(0, 7);
+        mSelectedYear = mSearchTime.substring(0, 4);
+        mSelectedMonth = mSearchTime.substring(5, 7);
 
         mShowTimeTextView = (TextView) findViewById(R.id.showtime_textview);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -107,20 +123,44 @@ public class StatisticsActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(viewPager);
         mTabLayout.setSelectedTabIndicatorColor(Color.alpha(0));
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mIndex = viewPager.getCurrentItem();
+                /* 得到当前的fragment，通过接口回调响应fragment的点击事件 */
+                MyFragment myFragment = (MyFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + mIndex);
+                myFragment.setOnShowTimeListener(new MyFragment.OnShowTime() {
+                    @Override
+                    public void showTime(String time) {
+                        mSelectedMonth = time;
+                        mSearchTime = mSearchTime.substring(0, 5) + mSelectedMonth;
+                        mShowTimeTextView.setText(mSearchTime);
+                        hideChooseTimeLayout();
+                        notifyTimeChange();
+                    }
+                });
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 isSelected = true;
                 showChooseTimeLayout();
-                int index = viewPager.getCurrentItem();
-                /* 得到当前的fragment，通过接口回调响应fragment的点击事件 */
-                MyFragment myFragment = (MyFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + index);
-                myFragment.setOnShowTimeListener(new MyFragment.OnShowTime() {
-                    @Override
-                    public void showTime(String time) {
-                        mShowTimeTextView.setText("2017-01");
-                    }
-                });
+                if (tab.getPosition() == 0){
+                    hideChooseTimeLayout();
+                    showYearPickerDialog();
+                }
             }
 
             @Override
@@ -131,8 +171,27 @@ public class StatisticsActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
                 isSelected = true;
                 showChooseTimeLayout();
+                if (tab.getPosition() == 0){
+                    hideChooseTimeLayout();
+                    showYearPickerDialog();
+                }
             }
         });
+    }
+
+    private void showYearPickerDialog() {
+        YearPickerDialog dialog = new YearPickerDialog(StatisticsActivity.this, AlertDialog.THEME_HOLO_LIGHT,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        mShowTimeTextView.setText(year + "年");
+                        mSelectedYear = String.valueOf(year);
+                        mSearchTime = mSelectedYear + "-";
+                        notifyTimeChange();
+                    }
+                },
+                Integer.valueOf(mSelectedYear), 1, 1);
+        dialog.show();
     }
 
     private void showChooseTimeLayout() {
@@ -142,6 +201,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void hideChooseTimeLayout(){
+        isSelected = false;
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) viewPager.getLayoutParams();
         layoutParams.height = 0;
         viewPager.setLayoutParams(layoutParams);
@@ -152,11 +212,19 @@ public class StatisticsActivity extends AppCompatActivity {
 
         all_cost = (StatisticsView) findViewById(R.id.cost_statistics);
         all_cost.setCost(cost);
-        all_cost.setLength(cost/(cost+income));
+        if (cost == 0){
+            all_cost.setLength(0);
+        } else {
+            all_cost.setLength(cost/(cost+income));
+        }
 
         all_income = (StatisticsView) findViewById(R.id.income_statistics);
         all_income.setCost(income);
-        all_income.setLength(income/(cost+income));
+        if (income == 0){
+            all_income.setLength(0);
+        } else {
+            all_income.setLength(income/(cost+income));
+        }
 
         balance = cost-income;
         all_banlance = (StatisticsView) findViewById(R.id.balance_statistics);
@@ -166,12 +234,18 @@ public class StatisticsActivity extends AppCompatActivity {
             all_banlance.setColor(getResources().getColor(R.color.incomeColor));
         }
         all_banlance.setCost(balance);
-        all_banlance.setLength(Math.abs(balance)/(cost+income));
+        if (balance == 0){
+            all_banlance.setLength(0);
+        } else {
+            all_banlance.setLength(Math.abs(balance)/(cost+income));
+        }
     }
 
     private void calculateCostAndIncome() {
         getDataFromDataBase();
 
+        cost = 0;
+        income = 0;
         for (Account account:accounts){
             if (account.getType()==Account.TYPE_COST){
                 cost += account.getCost();
@@ -184,7 +258,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private void getDataFromDataBase() {
         setupDataBase();
 
-        Cursor cursor = mDataBase.query("Account",null,"time LIKE ?", new String[]{mCurrentYearAndMonth+"%"},null,null,null);
+        Cursor cursor = mDataBase.query("Account",null,"time LIKE ?", new String[]{mSearchTime + "%"},null,null,null);
         if (cursor.moveToFirst()){
             do{
                 Account account = new Account();
@@ -237,6 +311,32 @@ public class StatisticsActivity extends AppCompatActivity {
     private void setupPieChart() {
         mCostPieChartView.setTagInformation(mCostTagInformations);
         mIncomePieChartView.setTagInformation(mIncomeTagInformations);
+        if (mCostTagInformations.size() == 0){
+            mCostPieChartView.setVisibility(View.GONE);
+        } else {
+            mCostPieChartView.setVisibility(View.VISIBLE);
+        }
+        if (mIncomeTagInformations.size() == 0){
+            mIncomePieChartView.setVisibility(View.GONE);
+        } else {
+            mIncomePieChartView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void notifyTimeChange(){
+        accounts.clear();
+        mCostTagInformations.clear();
+        mIncomeTagInformations.clear();
+        mCostTagNames.clear();
+        mIncomeTagNames.clear();
+        showStatisticsView();
+        makeStatisticsOfTag();
+        setupPieChart();
+        all_cost.invalidate();
+        all_income.invalidate();
+        all_banlance.invalidate();
+        mCostPieChartView.invalidate();
+        mIncomePieChartView.invalidate();
     }
 
     @Override

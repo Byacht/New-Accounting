@@ -32,6 +32,9 @@ public class StatisticsView extends View {
 
     public void setLength(float length) {
         this.length = length;
+        if (length == 0) {
+            this.length = (float)0.03;
+        }
     }
 
     public StatisticsView(Context context, AttributeSet attrs) {
@@ -57,7 +60,7 @@ public class StatisticsView extends View {
 
         canvas.drawText(type,20,height-20,mPaint);
 
-        rectWidth = length*(width-30-mPaint.measureText(type));
+        rectWidth = length * (width-30-mPaint.measureText(type));
         canvas.drawRect(50+mPaint.measureText(type),20,rectWidth+30+mPaint.measureText(type),height,mPaint);
 
         if ((30+mPaint.measureText(type)+rectWidth)+mPaint.measureText(costText)<width){

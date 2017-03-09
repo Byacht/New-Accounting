@@ -12,8 +12,10 @@ import android.view.View;
 
 import com.example.dn.accounting.Model.TagInformation;
 import com.example.dn.accounting.R;
+import com.example.dn.accounting.SortByPrice;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by dn on 2017/2/27.
@@ -118,7 +120,9 @@ public class PieChartView extends View {
     }
 
     public void setTagInformation(ArrayList<TagInformation> tagInformations){
+        Collections.sort(tagInformations, new SortByPrice());
         this.mTagInformations = tagInformations;
+        mAllCost = 0;
         for (TagInformation tagInformation : mTagInformations){
             mAllCost += tagInformation.getTagCost();
         }

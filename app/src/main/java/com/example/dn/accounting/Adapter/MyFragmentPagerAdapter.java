@@ -13,7 +13,7 @@ import com.example.dn.accounting.View.MyFragment;
 
 public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
     private Context context;
-    private String[] Tabs = new String[]{"按年","按月"};
+    private String[] Tabs = new String[]{"按年","按月","自定义"};
     public MyFragmentPagerAdapter(FragmentManager fm,Context context){
         super(fm);
         this.context = context;
@@ -25,7 +25,7 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
