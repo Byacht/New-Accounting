@@ -20,13 +20,10 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.andreabaccega.widget.FormEditText;
 import com.example.dn.accounting.DataBase.DBManager;
 import com.example.dn.accounting.Model.Account;
-import com.example.dn.accounting.DataBase.AccountDataBase;
 import com.example.dn.accounting.R;
 
 import java.io.Serializable;

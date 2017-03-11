@@ -2,15 +2,18 @@ package com.example.dn.accounting.Activity;
 
 import android.app.ActivityOptions;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -29,6 +32,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -39,11 +43,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.andreabaccega.widget.FormEditText;
 import com.example.dn.accounting.DataBase.DBManager;
 import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.Adapter.AccountAdapter;
-import com.example.dn.accounting.DataBase.AccountDataBase;
 import com.example.dn.accounting.R;
 import com.example.dn.accounting.Utils.TimeUtil;
 import com.example.dn.accounting.View.YearMonthPickerDialog;
@@ -85,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
     private boolean isSelectAll = true;
 
     private ImageView add;  //添加账单按钮
+
+    private float startX;
+    private float startY;
+    private float endX;
+    private float endY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,8 +211,8 @@ public class MainActivity extends AppCompatActivity {
                 mCost += account.getCost();
             }
         }
-        mIncomeTextView.setText(mCurrentYearAndMonth.substring(5, 7) + "月收入" + "\n" + String.valueOf(mIncome));
-        mCostTextView.setText(mCurrentYearAndMonth.substring(5, 7) + "月支出" + "\n" + String.valueOf(mCost));
+        mIncomeTextView.setText(mCurrentYearAndMonth.substring(5, 7) + "月收入" + "\n" + String.format("%.1f", mIncome));
+        mCostTextView.setText(mCurrentYearAndMonth.substring(5, 7) + "月支出" + "\n" + String.format("%.1f", mCost));
     }
 
     private void setupRecylerView() {
@@ -442,6 +449,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
+                ImageView imageView = (ImageView)findViewById(R.id.navigation_iv);
+                Bitmap bt = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/" + "head.jpg");// 从SD卡中找头像，转换成Bitmap
+                if (bt != null) {
+                    @SuppressWarnings("deprecation")
+                    Drawable drawable = new BitmapDrawable(bt);// 转换成drawable
+                    Log.d("out", "setImage");
+                    imageView.setImageDrawable(drawable);
+                } else {
+                    /**
+                     * 如果SD里面没有则需要从服务器取头像，取回来的头像再保存在SD中
+                     *
+                     */
+                    imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+                }
             }
 
             @Override

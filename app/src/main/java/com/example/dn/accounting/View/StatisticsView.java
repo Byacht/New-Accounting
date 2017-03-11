@@ -27,7 +27,7 @@ public class StatisticsView extends View {
 
     public void setCost(float cost) {
         this.cost = cost;
-        costText = String.valueOf(cost);
+        costText = String.format("%.1f", cost);
     }
 
     public void setLength(float length) {

@@ -2,6 +2,7 @@ package com.example.dn.accounting.Activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -10,16 +11,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.dn.accounting.Adapter.MyFragmentPagerAdapter;
-import com.example.dn.accounting.DataBase.AccountDataBase;
 import com.example.dn.accounting.DataBase.DBManager;
 import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.Model.TagInformation;
@@ -41,6 +41,8 @@ public class StatisticsActivity extends AppCompatActivity {
     private String mSearchTime;
     private String mSelectedYear;
     private String mSelectedMonth;
+    private String mStartTime;
+    private String mEndTime;
 
     private TextView mShowTimeTextView;
     private ViewPager viewPager;
@@ -75,6 +77,7 @@ public class StatisticsActivity extends AppCompatActivity {
         initView();
         setupToolBar();
         setupTabLayout();
+        getDataFromDataBase();
         showStatisticsView();
         makeStatisticsOfTag();
         setupPieChart();
@@ -141,7 +144,7 @@ public class StatisticsActivity extends AppCompatActivity {
                         mSearchTime = mSearchTime.substring(0, 5) + mSelectedMonth;
                         mShowTimeTextView.setText(mSearchTime);
                         hideChooseTimeLayout();
-                        notifyTimeChange();
+                        notifyTimeChange(0);
                     }
                 });
             }
@@ -155,11 +158,15 @@ public class StatisticsActivity extends AppCompatActivity {
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                isSelected = true;
-                showChooseTimeLayout();
                 if (tab.getPosition() == 0){
-                    hideChooseTimeLayout();
                     showYearPickerDialog();
+                }
+                if (tab.getPosition() == 1){
+                    isSelected = true;
+                    showChooseTimeLayout();
+                }
+                if (tab.getPosition() == 2){
+                    showDoubleDatePicker();
                 }
             }
 
@@ -169,11 +176,15 @@ public class StatisticsActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                isSelected = true;
-                showChooseTimeLayout();
                 if (tab.getPosition() == 0){
-                    hideChooseTimeLayout();
                     showYearPickerDialog();
+                }
+                if (tab.getPosition() == 1){
+                    isSelected = true;
+                    showChooseTimeLayout();
+                }
+                if (tab.getPosition() == 2){
+                    showDoubleDatePicker();
                 }
             }
         });
@@ -187,11 +198,68 @@ public class StatisticsActivity extends AppCompatActivity {
                         mShowTimeTextView.setText(year + "年");
                         mSelectedYear = String.valueOf(year);
                         mSearchTime = mSelectedYear + "-";
-                        notifyTimeChange();
+                        notifyTimeChange(0);
                     }
                 },
                 Integer.valueOf(mSelectedYear), 1, 1);
         dialog.show();
+    }
+
+    private void showDoubleDatePicker(){
+        View view = LayoutInflater.from(StatisticsActivity.this).inflate(R.layout.double_datepicker_layout, null);
+        final DatePicker startDatePicker = (DatePicker) view.findViewById(R.id.StartDate_dp);
+        final DatePicker endDatePicker = (DatePicker) view.findViewById(R.id.EndDate_dp);
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(StatisticsActivity.this);
+        dialog.setView(view);
+        dialog.setTitle("请选择查询时间段");
+        dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int startYear = startDatePicker.getYear();
+                int startMonth = startDatePicker.getMonth() + 1;
+                int startDay = startDatePicker.getDayOfMonth();
+                int endYear = endDatePicker.getYear();
+                int endMonth = endDatePicker.getMonth() + 1;
+                int endDay = endDatePicker.getDayOfMonth();
+                String startM = formDate(startMonth);
+                String startD = formDate(startDay);
+                String endM = formDate(endMonth);
+                String endD = formDate(endDay);
+
+                mStartTime = startYear + "-" + startM + "-" + startD;
+                mEndTime = endYear + "-" + endM + "-" + endD;
+                notifyTimeChange(1);
+                dialog.dismiss();
+            }
+        });
+        dialog.setNegativeButton("取消", null);
+        dialog.create().show();
+
+    }
+
+    private String formDate(int time){
+        if (time < 10){
+            return "0" + time;
+        }
+        return time + "";
+    }
+
+    private void searchDataOfCustomTime(){
+        String sql= "select * from Account where time between '" + mStartTime + "' and '" + mEndTime + " 23:59:59'";
+        Cursor cursor = mDataBase.rawQuery(sql, null);
+        if (cursor.moveToFirst()){
+            do{
+                Account account = new Account();
+                account.setInformation(cursor.getString(cursor.getColumnIndex("information")));
+                account.setTime(cursor.getString(cursor.getColumnIndex("time")));
+                account.setCost(cursor.getFloat(cursor.getColumnIndex("cost")));
+                account.setType(cursor.getInt(cursor.getColumnIndex("type")));
+                account.setTagName(cursor.getString(cursor.getColumnIndex("tag")));
+                accounts.add(account);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
     }
 
     private void showChooseTimeLayout() {
@@ -242,8 +310,6 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void calculateCostAndIncome() {
-        getDataFromDataBase();
-
         cost = 0;
         income = 0;
         for (Account account:accounts){
@@ -323,12 +389,17 @@ public class StatisticsActivity extends AppCompatActivity {
         }
     }
 
-    private void notifyTimeChange(){
+    private void notifyTimeChange(int searchWay){
         accounts.clear();
         mCostTagInformations.clear();
         mIncomeTagInformations.clear();
         mCostTagNames.clear();
         mIncomeTagNames.clear();
+        if (searchWay == 0){
+            getDataFromDataBase();
+        } else if (searchWay == 1){
+            searchDataOfCustomTime();
+        }
         showStatisticsView();
         makeStatisticsOfTag();
         setupPieChart();

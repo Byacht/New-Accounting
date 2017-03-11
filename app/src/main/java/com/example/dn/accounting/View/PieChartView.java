@@ -104,7 +104,7 @@ public class PieChartView extends View {
             mPaint.setColor(Color.BLACK);
             mPaint.setTextSize(80);
             canvas.drawText(text, getMeasuredWidth()/2 - mPaint.measureText(text)/2, getMeasuredHeight()/2, mPaint);
-            canvas.drawText("" + mAllCost, getMeasuredWidth()/2 - mPaint.measureText("" + mAllCost)/2, getMeasuredHeight()/2 + mPaint.measureText("ab"), mPaint);
+            canvas.drawText(String.format("%.1f", mAllCost), getMeasuredWidth()/2 - mPaint.measureText(String.format("%.1f", mAllCost))/2, getMeasuredHeight()/2 + mPaint.measureText("ab"), mPaint);
         }
 
 
