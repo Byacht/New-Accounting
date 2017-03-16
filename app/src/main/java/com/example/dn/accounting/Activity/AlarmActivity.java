@@ -47,6 +47,8 @@ public class AlarmActivity extends AppCompatActivity {
             public void onToggle(boolean on) {
                 if (on){
                     Log.d("out","on");
+//                    Intent serviceIntent = new Intent(AlarmActivity.this, AlarmService.class);
+//                    startService(serviceIntent);
                     AlarmManagerUtil.setAlarm(AlarmActivity.this,mAlarmTime);
                     editor.putBoolean("isAlarmSet",true);
                     editor.commit();

@@ -75,14 +75,13 @@
 
                 <ImageView
                     android:id="@+id/add"
-                    style="@style/MaterialAnimations"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
                     android:layout_margin="20dp"
                     android:src="@drawable/add"
-                    android:elevation="100dp"
+                    android:elevation="10dp"
                     android:transitionName="@string/add"/>
 
                 <android.support.v7.widget.RecyclerView

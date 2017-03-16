@@ -32,7 +32,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -87,11 +86,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean isSelectAll = true;
 
     private ImageView add;  //添加账单按钮
-
-    private float startX;
-    private float startY;
-    private float endX;
-    private float endY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -23,11 +23,17 @@ public class TagChoiceAdapter extends RecyclerView.Adapter<TagChoiceAdapter.MyVi
 
     private Context mContext;
     private ArrayList<Tag> tags;
+    private ArrayList<Boolean> isSelected;
     private OnItemClickListener onItemClickListener;
 
     public TagChoiceAdapter(Context context, ArrayList<Tag> tags){
         mContext = context;
         this.tags = tags;
+        isSelected = new ArrayList<Boolean>();
+        for (int i = 0; i < tags.size(); i++){
+            isSelected.add(false);
+        }
+        isSelected.set(0, true);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener){
@@ -36,7 +42,8 @@ public class TagChoiceAdapter extends RecyclerView.Adapter<TagChoiceAdapter.MyVi
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MyViewHolder(LayoutInflater.from(mContext).inflate(R.layout.tag_view, parent, false));
+        View view = LayoutInflater.from(mContext).inflate(R.layout.tag_view, parent, false);
+        return new MyViewHolder(view);
     }
 
     @Override
@@ -51,9 +58,29 @@ public class TagChoiceAdapter extends RecyclerView.Adapter<TagChoiceAdapter.MyVi
             @Override
             public void onClick(View v) {
                 onItemClickListener.onItemClick(position);
-                holder.textview.setTextColor(Color.RED);
+                for (int i = 0; i < tags.size(); i++){
+                    isSelected.set(i, false);
+                }
+                isSelected.set(position, true);
+                notifyDataSetChanged();
             }
         });
+        holder.textview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(position);
+                for (int i = 0; i < tags.size(); i++){
+                    isSelected.set(i, false);
+                }
+                isSelected.set(position, true);
+                notifyDataSetChanged();
+            }
+        });
+        if (isSelected.get(position)){
+            holder.textview.setTextColor(Color.RED);
+        } else {
+            holder.textview.setTextColor(Color.BLACK);
+        }
     }
 
     @Override

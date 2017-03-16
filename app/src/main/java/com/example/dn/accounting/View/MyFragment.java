@@ -3,7 +3,6 @@ package com.example.dn.accounting.View;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import com.example.dn.accounting.R;
 public class MyFragment extends Fragment implements View.OnClickListener{
     private static final String ARGS_PAGE = "page";
     private int mPage;
-    private TextView mTextView;
 
     public interface OnShowTime{
         void showTime(String time);
@@ -65,7 +63,7 @@ public class MyFragment extends Fragment implements View.OnClickListener{
             view.findViewById(R.id.Nov).setOnClickListener(this);
             view.findViewById(R.id.Dec).setOnClickListener(this);
         } else {
-            view = inflater.inflate(R.layout.choose_month_layout,container,false);
+            view = null;
         }
         return view;
     }

@@ -94,7 +94,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void initView(){
-        viewHeight = 350;
+        viewHeight = 400;
         mSearchTime = TimeUtil.getCurrentTime().substring(0, 7);
         mSelectedYear = mSearchTime.substring(0, 4);
         mSelectedMonth = mSearchTime.substring(5, 7);
@@ -159,6 +159,7 @@ public class StatisticsActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0){
+                    hideChooseTimeLayout();
                     showYearPickerDialog();
                 }
                 if (tab.getPosition() == 1){
@@ -166,6 +167,7 @@ public class StatisticsActivity extends AppCompatActivity {
                     showChooseTimeLayout();
                 }
                 if (tab.getPosition() == 2){
+                    hideChooseTimeLayout();
                     showDoubleDatePicker();
                 }
             }
