@@ -92,9 +92,9 @@ public class PieChartView extends View {
             mPaint.setColor(color[i]);
             canvas.drawLine(startX[i], startY[i], endX[i], endY[i], mPaint);
             if (endY[i] <= getMeasuredHeight() / 2){
-                canvas.drawText(tagName[i], endX[i] - mPaint.measureText(tagName[i])/2, endY[i], mPaint);
+                canvas.drawText(tagName[i], endX[i] - mPaint.measureText(tagName[i])/2, endY[i] - 20, mPaint);
             } else {
-                canvas.drawText(tagName[i],endX[i] - mPaint.measureText(tagName[i])/2, endY[i] + 15, mPaint);
+                canvas.drawText(tagName[i],endX[i] - mPaint.measureText(tagName[i])/2, endY[i] + 45, mPaint);
             }
         }
         mPaint.setColor(Color.WHITE);

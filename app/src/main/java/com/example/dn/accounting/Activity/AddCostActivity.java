@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.text.SimpleDateFormat;
+import android.icu.util.TimeZone;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -226,7 +227,7 @@ public class AddCostActivity extends AppCompatActivity {
 
     private String getCurrentTime(){
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date curDate = new Date(System.currentTimeMillis());
+        Date curDate = new Date(System.currentTimeMillis() + 8 * 60 * 60 * 1000);
         String currentTime = formatter.format(curDate);
         return currentTime;
     }

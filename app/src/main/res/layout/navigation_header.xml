@@ -7,22 +7,23 @@
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <TextView
-        android:id="@+id/id_link"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="5dp"
-        android:text="https://github.com/Byacht"/>
+    <!--<TextView-->
+        <!--android:id="@+id/id_link"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginBottom="5dp"-->
+        <!--android:text="https://github.com/Byacht"/>-->
 
     <TextView
         android:id="@+id/id_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_above="@id/id_link"
-        android:text="Huang Ting"/>
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="The great pleasure in life is doing what people say you cannot do."/>
 
     <ImageView
         android:id="@+id/navigation_iv"

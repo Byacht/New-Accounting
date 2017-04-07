@@ -35,7 +35,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
     public AccountAdapter(Context context,List<Account> accounts){
         this.context = context;
         this.accounts = accounts;
-        Log.d("out",accounts.size()+"");
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener){

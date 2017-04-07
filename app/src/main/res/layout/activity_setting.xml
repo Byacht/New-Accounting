@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:toggle="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_setting"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.example.dn.accounting.Activity.SettingActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_setting"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/blue"/>
     
     <LinearLayout
         android:id="@+id/set_portrait_layout"
@@ -24,6 +31,7 @@
             android:id="@+id/portrait_imageview"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_gravity="center"
             android:padding="10dp"
             android:src="@mipmap/ic_launcher"/>
     </LinearLayout>
@@ -50,7 +58,46 @@
             android:id="@+id/background_imageview"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:padding="10dp"
+            android:layout_gravity="center"
             android:src="@mipmap/ic_launcher"/>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="10dp"
+        android:src="@color/divider_line"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_vertical"
+            android:text="超额提醒"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/tv_over_cost"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="#9E9E9E"/>
+        <com.zcw.togglebutton.ToggleButton
+            android:id="@+id/toggleButton_setting"
+            android:layout_width="40dp"
+            toggle:tbOnColor="#536DFE"
+            toggle:tbOffColor="#9E9E9E"
+            toggle:tbSpotColor="#F5F5F5"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dp"/>
     </LinearLayout>
 
 </LinearLayout>

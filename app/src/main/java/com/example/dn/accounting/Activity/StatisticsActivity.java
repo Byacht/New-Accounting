@@ -108,6 +108,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private void setupToolBar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar_statistics);
+        toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setTitle("统计分析");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

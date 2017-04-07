@@ -1,7 +1,5 @@
 package com.example.dn.accounting.Activity;
 
-import android.app.AlarmManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +25,7 @@ public class AlarmActivity extends AppCompatActivity {
     private TextView mAlarmTimeText;
     private int mAlarmTime = 0;
     private String mTime[] = new String[]{"00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00",
-            "11:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};
+            "12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +45,9 @@ public class AlarmActivity extends AppCompatActivity {
             public void onToggle(boolean on) {
                 if (on){
                     Log.d("out","on");
-//                    Intent serviceIntent = new Intent(AlarmActivity.this, AlarmService.class);
-//                    startService(serviceIntent);
-                    AlarmManagerUtil.setAlarm(AlarmActivity.this,mAlarmTime);
+                    Intent serviceIntent = new Intent(AlarmActivity.this, AlarmService.class);
+                    serviceIntent.putExtra("alarmTime", mAlarmTime);
+                    startService(serviceIntent);
                     editor.putBoolean("isAlarmSet",true);
                     editor.commit();
                     mAlarmTimeText.setVisibility(View.VISIBLE);

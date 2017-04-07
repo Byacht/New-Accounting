@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -13,9 +14,11 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
+import android.icu.util.TimeZone;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -87,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView add;  //添加账单按钮
 
+    private SharedPreferences mSharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         setupRecylerView();
         setupDrawer();
         setupDrawerContent();
+
+        Log.d("out", TimeUtil.getTime(this));
 
         mIncomeAndCostLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,9 +160,33 @@ public class MainActivity extends AppCompatActivity {
         longPressLayout = (LinearLayout) findViewById(R.id.longpress_layout);
     }
 
+    private void setAlarm() {
+        mSharedPreferences = getSharedPreferences("overCost", MODE_PRIVATE);
+        if (mSharedPreferences.getBoolean("isAlarmed", false)) {
+            String overCostText = mSharedPreferences.getString("overCost", "1000");
+            float overCost = Float.valueOf(overCostText);
+            if (overCost < mCost) {
+                mCostTextView.setTextColor(Color.RED);
+                if (mSharedPreferences.getBoolean("isShowSnackBar", false)) {
+                    Snackbar.make(mCostTextView, "当月支出已超出限额", Snackbar.LENGTH_LONG)
+                            .setAction("不再提醒", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    SharedPreferences.Editor editor = mSharedPreferences.edit();
+                                    editor.putBoolean("isShowSnackBar", false);
+                                    editor.commit();
+                                }
+                            })
+                            .show();
+                }
+
+            }
+        }
+    }
+
     private String getCurrentTime(){
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date curDate = new Date(System.currentTimeMillis());
+        Date curDate = new Date(System.currentTimeMillis() + 8 * 60 * 60 * 1000);
         String currentTime = formatter.format(curDate);
         return currentTime;
     }
@@ -313,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                             account.setInformation(information);
                             account.setCost(cost);
                         } else if (TextUtils.isEmpty(informationText.getText()) && TextUtils.isEmpty(costText.getText())){
-
+                            return;
                         } else if (TextUtils.isEmpty(costText.getText())){
                             String information = informationText.getText().toString();
                             values.put("information",information);
@@ -453,7 +484,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     /**
                      * 如果SD里面没有则需要从服务器取头像，取回来的头像再保存在SD中
-                     *
                      */
                     imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 }
@@ -509,6 +539,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         setIncomeAndCost();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setAlarm();
     }
 
     @Override

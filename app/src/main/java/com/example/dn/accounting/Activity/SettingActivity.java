@@ -1,8 +1,11 @@
 package com.example.dn.accounting.Activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -11,19 +14,24 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dn.accounting.R;
+import com.zcw.togglebutton.ToggleButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener{
     private LinearLayout mSetPortraitLayout;
@@ -31,14 +39,82 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView mPortraitImageView;
     private ImageView mBackgroundImageView;
     private Bitmap head;// 头像Bitmap
+    private Toolbar mToolbar;
+    private ToggleButton mToggleButton;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
     private static String path = Environment.getExternalStorageDirectory() + "/";// sd路径
+    private View view;
+    private EditText editText;
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         initView();
+        setupToolBar();
         initListener();
+
+        sharedPreferences = getSharedPreferences("overCost", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        mTextView = (TextView) findViewById(R.id.tv_over_cost);
+
+        mToggleButton.setOnToggleChanged(new ToggleButton.OnToggleChanged() {
+            @Override
+            public void onToggle(boolean on) {
+                if (on) {
+                    final AlertDialog dialog = createDialog();
+                    dialog.show();
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            inputCostLimit(dialog);
+                        }
+                    });
+                    dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mToggleButton.setToggleOff();
+                            dialog.dismiss();
+                        }
+                    });
+                } else {
+                    editor.clear();
+                    editor.putBoolean("isAlarmed", false);
+                    editor.putBoolean("isShowSnackBar", false);
+                    editor.commit();
+                    mTextView.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        if (sharedPreferences.getBoolean("isAlarmed", false)) {
+            mToggleButton.setToggleOn();
+            mTextView.setVisibility(View.VISIBLE);
+            mTextView.setText(sharedPreferences.getString("overCost", "0") + "元");
+        } else {
+            mToggleButton.setToggleOff();
+            mTextView.setVisibility(View.GONE);
+        }
+
+        mTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sharedPreferences.getBoolean("isAlarmed", false)) {
+                    final AlertDialog dialog = createDialog();
+                    dialog.show();
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            inputCostLimit(dialog);
+                        }
+                    });
+                }
+
+            }
+        });
 
         mSetPortraitLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,11 +131,39 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    private void inputCostLimit(AlertDialog dialog) {
+        String overCost = editText.getText().toString();
+        if (overCost.length() == 0) {
+            Toast.makeText(SettingActivity.this, "请设置额度", Toast.LENGTH_SHORT).show();
+        } else {
+            editor.putString("overCost", overCost);
+            editor.putBoolean("isAlarmed", true);
+            editor.putBoolean("isShowSnackBar", true);
+            editor.commit();
+            mTextView.setText(overCost + "元");
+            mTextView.setVisibility(View.VISIBLE);
+            dialog.dismiss();
+        }
+    }
+
+    private AlertDialog createDialog() {
+        view = LayoutInflater.from(SettingActivity.this).inflate(R.layout.dialog_over_cost, null);
+        editText = (EditText) view.findViewById(R.id.et_over_cost);
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this)
+                .setView(view)
+                .setTitle("请设置每月额度")
+                .setPositiveButton("确定", null)
+                .setNegativeButton("取消", null);
+        return builder.create();
+    }
+
     private void initView() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_setting);
         mSetPortraitLayout = (LinearLayout) findViewById(R.id.set_portrait_layout);
         mSetBackgroundLayout = (LinearLayout) findViewById(R.id.set_background_layout);
         mPortraitImageView = (ImageView) findViewById(R.id.portrait_imageview);
         mBackgroundImageView = (ImageView) findViewById(R.id.background_imageview);
+        mToggleButton = (ToggleButton) findViewById(R.id.toggleButton_setting);
         Bitmap bt = BitmapFactory.decodeFile(path + "head.jpg");// 从SD卡中找头像，转换成Bitmap
         if (bt != null) {
             @SuppressWarnings("deprecation")
@@ -71,6 +175,33 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
              *
              */
         }
+    }
+
+    private void enableCloseDialog(DialogInterface dialogInterface, boolean able) {
+        try {
+            Log.d("out", "enable1:" + able);
+            java.lang.reflect.Field field = dialogInterface.getClass().getSuperclass().getDeclaredField("mShowing");
+            field.setAccessible(true);
+            field.set(dialogInterface, able);
+            Log.d("out", "enable2:" + able);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("out", e.toString());
+        }
+    }
+
+    private void setupToolBar(){
+        mToolbar.setTitle("设置");
+        mToolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     private void initListener() {

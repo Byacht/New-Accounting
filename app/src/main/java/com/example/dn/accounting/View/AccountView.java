@@ -111,7 +111,7 @@ public class AccountView extends View {
 
         linePaint.setColor(costColor);
         linePaint.setTextSize((float)(accountHeight*0.1));
-        canvas.drawText("$"+cost,20+accountWidth/2-linePaint.measureText(cost+"$")/2,(float)(20+accountHeight*0.5),linePaint);
+        canvas.drawText("￥"+cost,20+accountWidth/2-linePaint.measureText(cost+"￥")/2,(float)(20+accountHeight*0.5),linePaint);
 
         linePaint.setColor(Color.GRAY);
         linePaint.setTextSize((float)(accountHeight*0.065));

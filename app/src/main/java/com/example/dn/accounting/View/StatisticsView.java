@@ -32,7 +32,7 @@ public class StatisticsView extends View {
 
     public void setLength(float length) {
         this.length = length;
-        if (length == 0) {
+        if (length <= 0.03) {
             this.length = (float)0.03;
         }
     }

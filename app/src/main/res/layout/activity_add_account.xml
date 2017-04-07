@@ -34,7 +34,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical|start"
                 android:text="记账"
-                android:textColor="#000"
+                android:textColor="#ffffff"
                 android:textSize="20dp"/>
         </RelativeLayout>
 

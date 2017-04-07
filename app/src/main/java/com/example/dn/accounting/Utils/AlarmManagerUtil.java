@@ -17,7 +17,7 @@ import static android.content.Context.ALARM_SERVICE;
 
 public class AlarmManagerUtil {
     public static final String ALARM_ACTION = "com.example.dn.alarm";
-    public static final int ONE_DAY = 24*60*60*1000;
+    public static final int ONE_DAY = 5*1000;
 
     public static void setAlarmTime(Context context,Intent intent){
         PendingIntent pi = PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
@@ -51,7 +51,7 @@ public class AlarmManagerUtil {
         int mHour=mCalendar.get(Calendar.HOUR_OF_DAY);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY,alarmTime);
-        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.MINUTE,39);
         calendar.set(Calendar.SECOND,0);
         calendar.set(Calendar.MILLISECOND,0);
         Log.d("out","now:"+mHour+"alarmTime:"+alarmTime);

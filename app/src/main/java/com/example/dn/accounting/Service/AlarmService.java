@@ -47,4 +47,12 @@ public class AlarmService extends Service {
         AlarmManagerUtil.setAlarm(this,alarmTime);
         return super.onStartCommand(intent, flags, startId);
     }
+
+    @Override
+    public void onDestroy() {
+        Log.d("out", "service destroy");
+        Intent serviceIntent = new Intent(this, AlarmService.class);
+        serviceIntent.putExtra("alarmTime", alarmTime);
+        this.startService(serviceIntent);
+    }
 }
