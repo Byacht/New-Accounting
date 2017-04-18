@@ -5,16 +5,13 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.text.SimpleDateFormat;
-import android.icu.util.TimeZone;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -24,19 +21,28 @@ import com.example.dn.accounting.DataBase.DBManager;
 import com.example.dn.accounting.Model.Account;
 import com.example.dn.accounting.Model.Tag;
 import com.example.dn.accounting.R;
+import com.example.dn.accounting.Utils.TimeUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class AddCostActivity extends AppCompatActivity {
 
-    private ImageView mImageView;
-    private EditText informationText;
-    private EditText costText;
+    @BindView(R.id.tag_img)
+    ImageView mTagImg;
+    @BindView(R.id.information_edittext)
+    EditText mInformationEdittext;
+    @BindView(R.id.cost_edittext)
+    EditText mCostEdittext;
+    @BindView(R.id.tag_rv)
+    RecyclerView mTagRv;
 
-    private RecyclerView tagChoiceView;
     private TagChoiceAdapter mAdapter;
 
     private int type;  //收入or支出
@@ -49,7 +55,6 @@ public class AddCostActivity extends AppCompatActivity {
     private Intent intent;
     private List<Account> newAccounts;
     private int tagPosition = 0;
-    private Button mCommitBtn;
 
 //    private final int maxLen = 16;
 //    private InputFilter filter = new InputFilter() {
@@ -99,52 +104,47 @@ public class AddCostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_cost);
+        ButterKnife.bind(this);
 
         type = getIntent().getIntExtra("TYPE", Account.TYPE_COST);
         tags = new ArrayList<Tag>();
-        if (type == Account.TYPE_COST){
+        if (type == Account.TYPE_COST) {
             initCostTags();
         } else {
             initIncomeTags();
         }
 
         initView();
+        setupDataBase();
 
         mAdapter = new TagChoiceAdapter(this, tags);
         mAdapter.setOnItemClickListener(new TagChoiceAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 Tag tag = tags.get(position);
-                mImageView.setImageDrawable(tag.getTagImage());
+                mTagImg.setImageDrawable(tag.getTagImage());
                 mAdapter.notifyDataSetChanged();
                 tagPosition = position;
             }
         });
-        tagChoiceView.setLayoutManager(new GridLayoutManager(this,5));
-        tagChoiceView.setAdapter(mAdapter);
-
-        setupDataBase();
-        mCommitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                commitInformation(type, tagPosition);
-            }
-        });
+        mTagRv.setLayoutManager(new GridLayoutManager(this, 5));
+        mTagRv.setAdapter(mAdapter);
 
     }
 
-    private void initView(){
+    @OnClick(R.id.commit_btn)
+    public void commitInformation(){
+        commitInformation(type, tagPosition);
+    }
+
+    private void initView() {
         Resources resources = getResources();
-        mImageView = (ImageView) findViewById(R.id.tag_imageview);
         if (type == Account.TYPE_COST) {
-            mImageView.setImageDrawable(resources.getDrawable(R.drawable.food));
+            mTagImg.setImageDrawable(resources.getDrawable(R.drawable.food));
         } else {
-            mImageView.setImageDrawable(resources.getDrawable(R.drawable.wages));
+            mTagImg.setImageDrawable(resources.getDrawable(R.drawable.wages));
         }
-        informationText = (EditText) findViewById(R.id.information_edittext);
-//        informationText.setFilters(new InputFilter[]{filter});
-        costText = (EditText) findViewById(R.id.cost_edittext);
-        costText.addTextChangedListener(new TextWatcher() {
+        mCostEdittext.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -156,21 +156,21 @@ public class AddCostActivity extends AppCompatActivity {
                     if (s.length() - 1 - s.toString().indexOf(".") > 1) {
                         s = s.toString().subSequence(0,
                                 s.toString().indexOf(".") + 2);
-                        costText.setText(s);
-                        costText.setSelection(s.length());
+                        mCostEdittext.setText(s);
+                        mCostEdittext.setSelection(s.length());
                     }
                 }
                 if (s.toString().trim().substring(0).equals(".")) {
                     s = "0" + s;
-                    costText.setText(s);
-                    costText.setSelection(2);
+                    mCostEdittext.setText(s);
+                    mCostEdittext.setSelection(2);
                 }
 
                 if (s.toString().startsWith("0")
                         && s.toString().trim().length() > 1) {
                     if (!s.toString().substring(1, 2).equals(".")) {
-                        costText.setText(s.subSequence(0, 1));
-                        costText.setSelection(1);
+                        mCostEdittext.setText(s.subSequence(0, 1));
+                        mCostEdittext.setSelection(1);
                         return;
                     }
                 }
@@ -181,27 +181,25 @@ public class AddCostActivity extends AppCompatActivity {
 
             }
         });
-        tagChoiceView = (RecyclerView) findViewById(R.id.tag_view);
-        mCommitBtn = (Button) findViewById(R.id.commit_btn);
     }
 
     private void commitInformation(int type, int tagPosition) {
-        if (intent == null || newAccounts == null){
-            intent = new Intent(this,MainActivity.class);
+        if (intent == null || newAccounts == null) {
+            intent = new Intent(this, MainActivity.class);
             newAccounts = new ArrayList<Account>();
         }
-        if (!TextUtils.isEmpty(informationText.getText()) && !TextUtils.isEmpty(costText.getText())){
-            information = informationText.getText().toString();
-            cost = Float.valueOf(costText.getText().toString());
-            time = getCurrentTime();
+        if (!TextUtils.isEmpty(mInformationEdittext.getText()) && !TextUtils.isEmpty(mInformationEdittext.getText())) {
+            information = mInformationEdittext.getText().toString();
+            cost = Float.valueOf(mCostEdittext.getText().toString());
+            time = TimeUtil.getCurrentTime();
             String tagName = tags.get(tagPosition).getTagName();
             ContentValues values = new ContentValues();
-            values.put("information",information);
+            values.put("information", information);
             values.put("cost", cost);
             values.put("time", time);
             values.put("tag", tagName);
             values.put("type", type);
-            mDataBase.insert("Account",null,values);
+            mDataBase.insert("Account", null, values);
 
             Account account = new Account();
             account.setInformation(information);
@@ -211,12 +209,12 @@ public class AddCostActivity extends AppCompatActivity {
             account.setType(type);
             newAccounts.add(account);
 
-            informationText.setText("");
-            costText.setText("");
-            informationText.requestFocus();
-            Toast.makeText(AddCostActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
+            mInformationEdittext.setText("");
+            mCostEdittext.setText("");
+            mInformationEdittext.requestFocus();
+            Toast.makeText(AddCostActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(AddCostActivity.this,"信息不全，请完善信息",Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddCostActivity.this, "信息不全，请完善信息", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -225,23 +223,16 @@ public class AddCostActivity extends AppCompatActivity {
         mDataBase = DBManager.getInstance(AddCostActivity.this).getDataBase();
     }
 
-    private String getCurrentTime(){
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date curDate = new Date(System.currentTimeMillis() + 8 * 60 * 60 * 1000);
-        String currentTime = formatter.format(curDate);
-        return currentTime;
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (intent!=null){
+        if (intent != null) {
             intent.putExtra("newAccounts", (Serializable) newAccounts);
             startActivity(intent);
         }
     }
 
-    private void initCostTags(){
+    private void initCostTags() {
         Resources resources = getResources();
 
         Tag foodTag = new Tag();
@@ -306,7 +297,7 @@ public class AddCostActivity extends AppCompatActivity {
         tags.add(othersTag);
     }
 
-    private void initIncomeTags(){
+    private void initIncomeTags() {
         Resources resources = getResources();
 
         Tag wagesTag = new Tag();

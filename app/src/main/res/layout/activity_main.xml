@@ -17,7 +17,6 @@
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
-                xmlns:account="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/activity_main"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -39,14 +38,14 @@
                 </android.support.v7.widget.Toolbar>
 
                 <LinearLayout
-                    android:id="@+id/cost_income_layout"
+                    android:id="@+id/show_cost_income_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:background="@color/blue"
                     android:layout_below="@id/toolbar_main">
                     <TextView
-                        android:id="@+id/income_textview"
+                        android:id="@+id/income_tv"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -62,7 +61,7 @@
                         android:padding="5dp"
                         android:layout_gravity="center"/>
                     <TextView
-                        android:id="@+id/cost_textview"
+                        android:id="@+id/cost_tv"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -74,7 +73,7 @@
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/add"
+                    android:id="@+id/img_add_account"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_alignParentBottom="true"
@@ -85,15 +84,15 @@
                     android:transitionName="@string/add"/>
 
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerview"
+                    android:id="@+id/rv_account_item"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/cost_income_layout"
+                    android:layout_below="@id/show_cost_income_layout"
                     android:divider="#ffff0000"
                     android:dividerHeight="10dp"/>
 
                 <LinearLayout
-                    android:id="@+id/longpress_layout"
+                    android:id="@+id/batch_delete_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"

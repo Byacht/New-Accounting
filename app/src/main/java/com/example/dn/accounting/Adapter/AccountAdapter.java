@@ -16,6 +16,10 @@ import com.example.dn.accounting.R;
 
 import java.util.List;
 
+import butterknife.BindColor;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by dn on 2016/11/13.
  */
@@ -47,7 +51,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        MyViewHolder holder = new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.account_view,parent,false));
+        MyViewHolder holder = new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.account_view, parent, false));
         return holder;
     }
 
@@ -59,12 +63,12 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
         time = account.getTime();
         type = account.getType();
         if (type == Account.TYPE_COST){
-            holder.accountView.setCostColor(context.getResources().getColor(R.color.costColor));
-            holder.accountView.setTitleColor(context.getResources().getColor(R.color.costColor));
+            holder.accountView.setCostColor(holder.costColor);
+            holder.accountView.setTitleColor(holder.costColor);
             holder.accountView.setTitle("账户支出");
         } else{
-            holder.accountView.setCostColor(context.getResources().getColor(R.color.incomeColor));
-            holder.accountView.setTitleColor(context.getResources().getColor(R.color.incomeColor));
+            holder.accountView.setCostColor(holder.incomeColor);
+            holder.accountView.setTitleColor(holder.incomeColor);
             holder.accountView.setTitle("账户收入");
         }
         holder.accountView.setCost(cost);
@@ -74,7 +78,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
             @Override
             public boolean onLongClick(View v) {
                 if (onItemLongClickListener!=null){
-                    onItemLongClickListener.onItemLongClick(holder.accountView,position);
+                    onItemLongClickListener.onItemLongClick(holder. accountView, position);
                 }
                 return false;
             }
@@ -105,7 +109,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
             holder.checkBox.setChecked(false);
         }
 
-
     }
 
     @Override
@@ -120,13 +123,18 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.MyViewHo
 
     class MyViewHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.account_view)
         AccountView accountView;
+        @BindView(R.id.cb_item_selected)
         CheckBox checkBox;
+        @BindColor(R.color.costColor)
+        int costColor;
+        @BindColor(R.color.incomeColor)
+        int incomeColor;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            accountView = (AccountView) itemView.findViewById(R.id.account);
-            checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
+            ButterKnife.bind(this, itemView);
         }
     }
 
