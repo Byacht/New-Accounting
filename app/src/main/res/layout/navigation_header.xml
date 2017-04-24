@@ -5,6 +5,7 @@
     android:background="@color/blue"
     android:orientation="vertical"
     android:padding="16dp"
+    android:tag="skin:bg_color:background"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <!--<TextView-->

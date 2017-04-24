@@ -36,5 +36,6 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.0'
     compile 'com.zcw:togglebutton-library:1.0.0'
+    compile 'com.zhy:changeskin:4.0.2'
     testCompile 'junit:junit:4.12'
 }

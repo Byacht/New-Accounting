@@ -31,6 +31,7 @@ import com.example.dn.accounting.View.MyFragment;
 import com.example.dn.accounting.View.PieChartView;
 import com.example.dn.accounting.View.StatisticsView;
 import com.example.dn.accounting.View.YearPickerDialog;
+import com.zhy.changeskin.SkinManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +96,7 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
         ButterKnife.bind(this);
+        SkinManager.getInstance().register(this);
 
         initView();
         setupToolBar();
@@ -421,6 +423,12 @@ public class StatisticsActivity extends AppCompatActivity {
         mBalanceStatisticsView.invalidate();
         mCostPieChartView.invalidate();
         mIncomePieChartView.invalidate();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SkinManager.getInstance().unregister(this);
     }
 
     @Override

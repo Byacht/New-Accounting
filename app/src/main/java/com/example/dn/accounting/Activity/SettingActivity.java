@@ -1,5 +1,6 @@
 package com.example.dn.accounting.Activity;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,12 +27,12 @@ import android.widget.Toast;
 
 import com.example.dn.accounting.R;
 import com.zcw.togglebutton.ToggleButton;
+import com.zhy.changeskin.SkinManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener{
     private LinearLayout mSetPortraitLayout;
@@ -52,6 +53,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        SkinManager.getInstance().register(this);
         initView();
         setupToolBar();
         initListener();
@@ -126,8 +128,21 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         mSetBackgroundLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                View chooseColorView = LayoutInflater.from(SettingActivity.this).inflate(R.layout.dialog_choose_color, null);
+                ImageView blueColor = (ImageView) chooseColorView.findViewById(R.id.img_bg_color_pink);
+                blueColor.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SkinManager.getInstance().removeAnySkin();
+                    }
+                });
+                new AlertDialog.Builder(SettingActivity.this)
+                        .setView(chooseColorView)
+                        .setTitle("请选择背景颜色")
+                        .show();
 
             }
+
         });
     }
 
@@ -339,5 +354,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SkinManager.getInstance().unregister(this);
     }
 }

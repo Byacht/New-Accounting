@@ -15,116 +15,133 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <android.support.design.widget.CoordinatorLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/activity_main"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="com.example.dn.accounting.Activity.MainActivity">
 
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar_main"
-                    android:layout_width="match_parent"
-                    android:layout_height="?android:attr/actionBarSize"
-                    android:background="@color/blue">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="我的账单"
-                        android:textSize="18sp"
-                        android:textColor="@color/white"/>
-                </android.support.v7.widget.Toolbar>
-
-                <LinearLayout
-                    android:id="@+id/show_cost_income_layout"
+                <android.support.design.widget.AppBarLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@color/blue"
-                    android:layout_below="@id/toolbar_main">
-                    <TextView
-                        android:id="@+id/income_tv"
-                        android:layout_width="0dp"
+                    android:orientation="vertical">
+            <!--        <ImageView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="收入\n200"
-                        android:textSize="20sp"
-                        android:textColor="@color/white"
-                        android:padding="8dp"
-                        android:gravity="center"/>
-                    <ImageView
-                        android:layout_width="11dp"
-                        android:layout_height="40dp"
-                        android:src="@color/white"
-                        android:padding="5dp"
-                        android:layout_gravity="center"/>
-                    <TextView
-                        android:id="@+id/cost_tv"
-                        android:layout_width="0dp"
+                        android:id="@+id/top_view"/>-->
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolbar_main"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:tag="skin:bg_color:background"
+                        app:layout_scrollFlags="scroll|enterAlways">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="我的账单"
+                            android:textSize="18sp"
+                            android:textColor="@color/white"/>
+                    </android.support.v7.widget.Toolbar>
+
+                    <LinearLayout
+                        android:id="@+id/show_cost_income_layout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="支出\n200"
-                        android:textSize="20sp"
-                        android:textColor="@color/white"
-                        android:padding="8dp"
-                        android:gravity="center"/>
-                </LinearLayout>
+                        android:orientation="horizontal"
+                        android:tag="skin:bg_color:background"
+                        app:layout_scrollFlags="scroll|enterAlways">
+                        <TextView
+                            android:id="@+id/income_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="收入\n200"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:padding="8dp"
+                            android:gravity="center"/>
+                        <ImageView
+                            android:layout_width="11dp"
+                            android:layout_height="40dp"
+                            android:src="@color/white"
+                            android:padding="5dp"
+                            android:layout_gravity="center"/>
+                        <TextView
+                            android:id="@+id/cost_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="支出\n200"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:padding="8dp"
+                            android:gravity="center"/>
+                    </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/img_add_account"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="20dp"
-                    android:src="@drawable/add"
-                    android:elevation="10dp"
-                    android:transitionName="@string/add"/>
+                </android.support.design.widget.AppBarLayout>
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_account_item"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/show_cost_income_layout"
-                    android:divider="#ffff0000"
-                    android:dividerHeight="10dp"/>
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-                <LinearLayout
-                    android:id="@+id/batch_delete_layout"
-                    android:layout_width="match_parent"
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_account_item"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:divider="#ffff0000"
+                        android:dividerHeight="10dp"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+                    <LinearLayout
+                        android:id="@+id/batch_delete_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:visibility="gone"
+                        android:background="@drawable/framebackground">
+                        <Button
+                            android:id="@+id/select_all_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_margin="4dp"
+                            android:text="全选"
+                            android:textSize="15sp"
+                            android:background="@drawable/button_pressed"/>
+                        <ImageView
+                            android:layout_width="1dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:src="@color/divider_line"/>
+                        <Button
+                            android:id="@+id/delete_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_margin="4dp"
+                            android:text="删除"
+                            android:textSize="15sp"
+                            android:background="@drawable/button_pressed"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/float_btn_add_account"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:visibility="gone"
-                    android:background="@drawable/framebackground">
-                    <Button
-                        android:id="@+id/select_all_btn"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:layout_margin="4dp"
-                        android:text="全选"
-                        android:textSize="15sp"
-                        android:background="@drawable/button_pressed"/>
-                    <ImageView
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:src="@color/divider_line"/>
-                    <Button
-                        android:id="@+id/delete_btn"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:layout_margin="4dp"
-                        android:text="删除"
-                        android:textSize="15sp"
-                        android:background="@drawable/button_pressed"/>
-                </LinearLayout>
-            </RelativeLayout>
+                    android:layout_margin="25dp"
+                    android:layout_gravity="right|bottom"
+                    android:src="@drawable/add1"/>
+
+            </android.support.design.widget.CoordinatorLayout>
         </FrameLayout>
 
         <android.support.design.widget.NavigationView

@@ -13,10 +13,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -35,12 +35,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,11 +55,12 @@ import com.example.dn.accounting.R;
 import com.example.dn.accounting.Utils.DBUtil;
 import com.example.dn.accounting.Utils.TimeUtil;
 import com.example.dn.accounting.View.YearMonthPickerDialog;
+import com.zhy.changeskin.SkinManager;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -75,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
     TextView mCostTv;
     @BindView(R.id.rv_account_item)
     RecyclerView mRvAccountItem;
-    @BindView(R.id.img_add_account)
-    ImageView mImgAddAccount;
     @BindView(R.id.select_all_btn)
     Button mSelectAllBtn;
     @BindView(R.id.delete_btn)
@@ -85,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout mBatchDeleteLayout;
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
+    @BindView(R.id.float_btn_add_account)
+    FloatingActionButton mBtnAddAccount;
     @BindView(R.id.drawerlayout)
     DrawerLayout mDrawerlayout;
 
@@ -106,14 +109,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean isSelectAll = true;
 
     private SharedPreferences mSharedPreferences;
+    private boolean firstOpen = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SkinManager.getInstance().register(this);
         ButterKnife.bind(this);
 
-        initView();
+        initData();
         setupToolBar();
         setupWindowAnimations();
         setupDataBase();
@@ -123,12 +128,37 @@ public class MainActivity extends AppCompatActivity {
         setupDrawer();
         setupDrawerContent();
 
+//        ViewGroup.LayoutParams layoutParams = topView.getLayoutParams();
+//        int height = 0;
+//        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+//        if (resourceId > 0) {
+//            height = getResources().getDimensionPixelSize(resourceId);
+//        }
+//        layoutParams.height = height;
+//        topView.setLayoutParams(layoutParams);
+//        topView.setBackgroundColor(Color.TRANSPARENT);
     }
 
-    private void initView() {
+    private void initData() {
         mCurrentYearAndMonth = TimeUtil.getCurrentTime().substring(0, 7);  //取得当前年月，查找数据库中符合这个时间的数据
         mSearchYear = mCurrentYearAndMonth.substring(0, 4);
         mSearchMonth = mCurrentYearAndMonth.substring(5, 7);
+
+        mSharedPreferences = getSharedPreferences("overCost", MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        /*
+         * 如果是新的一个月,则重置超额提醒标识"isAlarmed"
+         */
+        if (TimeUtil.getCurrentTime().substring(8, 10).equals("01")){
+            if (mSharedPreferences.getBoolean("isNextMonth", true)){
+                editor.putBoolean("isShowSnackBar", true);
+                editor.putBoolean("isNextMonth", false);
+                editor.commit();
+            }
+        } else {
+            editor.putBoolean("isNextMonth", true);
+            editor.commit();
+        }
     }
 
     @OnClick(R.id.show_cost_income_layout)
@@ -151,17 +181,16 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    @OnClick(R.id.img_add_account)
+    @OnClick(R.id.float_btn_add_account)
     public void addAccount(){
         Intent intent = new Intent(MainActivity.this, AddAccountActivity.class);
         String transitionName = getString(R.string.add);
-        ActivityOptions shareElement = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, mImgAddAccount, transitionName);
+        ActivityOptions shareElement = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, mBtnAddAccount, transitionName);
         startActivityForResult(intent, 1000, shareElement.toBundle());
     }
 
     private void setAlarm() {
-        mSharedPreferences = getSharedPreferences("overCost", MODE_PRIVATE);
-        if (mSharedPreferences.getBoolean("isAlarmed", false)) {
+        if (mSharedPreferences.getBoolean("isAlarmed", false) && firstOpen) {
             String overCostText = mSharedPreferences.getString("overCost", "1000");
             float overCost = Float.valueOf(overCostText);
             if (overCost < mCost) {
@@ -178,8 +207,10 @@ public class MainActivity extends AppCompatActivity {
                             })
                             .show();
                 }
-
+            } else {
+                mCostTv.setTextColor(Color.WHITE);
             }
+            firstOpen = false;
         }
     }
 
@@ -526,13 +557,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         if (mCurrentYearAndMonth.equals(TimeUtil.getCurrentTime().substring(0, 7))) {
             ArrayList<Account> newAccounts = (ArrayList<Account>) intent.getSerializableExtra("newAccounts");
-            for (Account account : newAccounts) {
-                accounts.add(account);
-                adapter.notifyDataSetChanged();
-            }
+            if (newAccounts != null){
+                for (Account account : newAccounts) {
+                    accounts.add(account);
+                    adapter.notifyDataSetChanged();
+                }
 
-            if (accounts.size() > 0) {
-                mRvAccountItem.smoothScrollToPosition(accounts.size() - 1);
+                if (accounts.size() > 0) {
+                    mRvAccountItem.smoothScrollToPosition(accounts.size() - 1);
+                }
             }
         }
         setIncomeAndCost();
@@ -547,6 +580,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        SkinManager.getInstance().unregister(this);
     }
 
     @Override
